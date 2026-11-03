@@ -1,0 +1,50 @@
+:root {
+  --color-background: #000000;
+  --color-text: #ffffff;
+  --color-accent: #27f901;
+  --color-card: rgba(207, 201, 201, 0.173);
+  --color-dark: #0a196600;
+
+  --font-family-base: "neulis-sans", sans-serif;
+  --font-family-head: "neulis-sans", sans-serif;
+
+  --font-size-body: max(1.5vw, 1rem);
+  --font-size-h1: max(8vw, 2rem);
+  --font-size-h2: 5rem;
+  --font-size-h3: 2rem;
+  --font-size-p: 2rem;
+  --font-size-margin: 1.5rem;
+  --font-line-height: 1.5;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  margin: var(--font-size-margin);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+}
+
+h1 {
+  font-family: var(--font-family-head);
+  font-size: var(--font-size-h1);
+  line-height: 1;
+  margin: 0;
+  letter-spacing: 2px;
+  text-align: center;
+
+}
+
+h1 span:nth-child(1) { opacity: 0.05; stroke: none; }
+h1 span:nth-child(2) { opacity: 0.15; stroke: none; }
+h1 span:nth-child(3) { opacity: 0.05; stroke: none; }
+h1 span:nth-child(4) { opacity: 0.1; stroke: none; }
+h1 span:nth-child(5) { opacity: 0.05; stroke: none; }
+h1 span:nth-child(6) { opacity: 0.075; stroke: none; }
+h1 span:nth-child(7) { opacity: 0.2; stroke: none; }
+
+h1 span:hover {
+  transition: opacity 0.5s ease, filter 0.4s ease;
+  opacity: 1;
+  filter: blur(0);
+}
