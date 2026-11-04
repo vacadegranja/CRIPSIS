@@ -1,8 +1,10 @@
 :root {
   --color-background: #000000;
   --color-text: #ffffff;
-  --color-accent: #27f901;
-  --color-card: rgba(207, 201, 201, 0.173);
+  --color-accent-a: #c4a060;
+  --color-accent-t: #868c3f;
+  --color-accent-w: #6087a9;
+  --color-card: rgba(0, 0, 0, 0);
   --color-dark: #0a196600;
 
   --font-family-base: "neulis-sans", sans-serif;
@@ -46,7 +48,69 @@ h1 span:nth-child(7) { opacity: 0.2; stroke: none; }
 h1 span:hover {
   transition: opacity 0.5s ease, filter 0.4s ease;
   opacity: 1;
-  filter: blur(0);
+  filter: blur(2);
 }
 
+.home-sections {
+  margin-top: 2rem;
+}
 
+.home-sections > a {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100vw;
+  min-height: 7rem;
+  margin-left: calc(-1 * var(--font-size-margin));
+  padding: 1.5rem var(--font-size-margin);
+  border-bottom: 1px solid var(--color-card);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.home-line-a:hover,
+.home-line-a:focus-visible {
+  background-color: var(--color-accent-a);
+  color: var(--color-background);
+}
+
+.home-line-t:hover,
+.home-line-t:focus-visible {
+  background-color: var(--color-accent-t);
+  color: var(--color-background);
+}
+
+.home-line-w:hover,
+.home-line-w:focus-visible {
+  background-color: var(--color-accent-w);
+  color: var(--color-background);
+}
+
+.home-sections h3,
+.home-sections p {
+  margin: 0;
+}
+
+.home-sections h3 {
+  font-size: var(--font-size-h3);
+}
+
+.home-sections p {
+  font-size: var(--font-size-body);
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  .home-sections > a {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .home-sections p {
+    text-align: left;
+  }
+}
