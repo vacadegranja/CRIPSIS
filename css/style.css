@@ -75,26 +75,30 @@ h1 span:hover {
   padding: 1.5rem var(--font-size-margin);
   border-bottom: 1px solid var(--color-card);
   color: var(--color-text);
+  opacity: 0;
   text-decoration: none;
-  transition: background-color 0.6s ease, color 0.6s ease;
+  transition: background-color 0.6s ease, color 0.6s ease, opacity 0.6s ease;
 }
 
 .home-line-a:hover,
 .home-line-a:focus-visible {
   background-color: var(--color-accent-a);
   color: var(--color-background);
+  opacity: 1;
 }
 
 .home-line-t:hover,
 .home-line-t:focus-visible {
   background-color: var(--color-accent-t);
   color: var(--color-background);
+  opacity: 1;
 }
 
 .home-line-w:hover,
 .home-line-w:focus-visible {
   background-color: var(--color-accent-w);
   color: var(--color-background);
+  opacity: 1;
 }
 
 .home-sections h3,
@@ -120,5 +124,11 @@ h1 span:hover {
 
   .home-sections p {
     text-align: left;
+  }
+}
+
+@media (hover: none) {
+  .home-sections > a {
+    opacity: 1;
   }
 }
