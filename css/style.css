@@ -1,9 +1,14 @@
+@import url("https://use.typekit.net/dya8vty.css");
+
 :root {
   --color-background: #000000;
   --color-text: #ffffff;
   --color-accent-a: #c4a060;
   --color-accent-t: #868c3f;
   --color-accent-w: #6087a9;
+  --color-text-a: #000000;
+  --color-text-t: #000000;
+  --color-text-w: #000000;
   --color-card: rgba(0, 0, 0, 0);
   --color-dark: #0a196600;
 
@@ -17,6 +22,21 @@
   --font-size-p: 2rem;
   --font-size-margin: 1.5rem;
   --font-line-height: 1.5;
+}
+
+.earth-theme {
+  --color-background: var(--color-accent-t);
+  --color-text: var(--color-text-t);
+}
+
+.air-theme {
+  --color-background: var(--color-accent-a);
+  --color-text: var(--color-text-a);
+}
+
+.agua-theme {
+  --color-background: var(--color-accent-w);
+  --color-text: var(--color-text-w);
 }
 
 body {
