@@ -6,9 +6,9 @@
   --color-accent-a: #c4a060;
   --color-accent-t: #868c3f;
   --color-accent-w: #6087a9;
-  --color-text-a: #000000;
-  --color-text-t: #000000;
-  --color-text-w: #000000;
+  --color-text-a: #bc913b;
+  --color-text-t: #767e25;
+  --color-text-w: #2d7ab3;
   --color-card: rgba(0, 0, 0, 0);
   --color-dark: #0a196600;
 
@@ -56,17 +56,22 @@ h1 {
   text-align: center;
 
 }
-
+header p {
+  font-size: var(--font-size-h3);
+  text-align: center;
+  margin: 0;
+  letter-spacing: 2px;
+}
 h1 span {
   transition: opacity 0.6s ease, filter 0.6s ease;
 }
 
-h1 span:nth-child(1) { opacity: 0.05; stroke: none; }
-h1 span:nth-child(2) { opacity: 0.15; stroke: none; }
+h1 span:nth-child(1) { opacity: 0.3; stroke: none; }
+h1 span:nth-child(2) { opacity: 0.1; stroke: none; }
 h1 span:nth-child(3) { opacity: 0.05; stroke: none; }
-h1 span:nth-child(4) { opacity: 0.1; stroke: none; }
+h1 span:nth-child(4) { opacity: 0.2; stroke: none; }
 h1 span:nth-child(5) { opacity: 0.05; stroke: none; }
-h1 span:nth-child(6) { opacity: 0.075; stroke: none; }
+h1 span:nth-child(6) { opacity: 0.5; stroke: none; }
 h1 span:nth-child(7) { opacity: 0.2; stroke: none; }
 
 h1 span:hover {
