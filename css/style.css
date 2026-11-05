@@ -19,7 +19,7 @@
   --font-size-h1: max(10vw, 2rem);
   --font-size-h2: 5rem;
   --font-size-h3: 2rem;
-  --font-size-p: 2rem;
+  --font-size-p: 1.35rem;
   --font-size-margin: 1.5rem;
   --font-line-height: 1.5;
 }
@@ -47,6 +47,22 @@ body {
   font-size: var(--font-size-body);
 }
 
+p {
+  font-size: var(--font-size-p);
+  line-height: var(--font-line-height);
+  margin: 0.75rem 0 0;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-top: 5rem;
+}
+
+img {
+  max-width: 60%;
+  height: auto;
+  display: block;
+  margin: 1rem auto 0;
+  border-radius: 10px;
+}
 h1 {
   font-family: var(--font-family-head);
   font-size: var(--font-size-h1);
@@ -62,6 +78,7 @@ header p {
   margin: 0;
   letter-spacing: 2px;
 }
+
 h1 span {
   transition: opacity 0.6s ease, filter 0.6s ease;
 }
@@ -79,11 +96,6 @@ h1 span:hover {
   filter: blur(0);
 }
 
-.hero p {
-  margin: 0.75rem 0 0;
-  text-align: center;
-}
-
 .home-sections {
   margin-top: 2rem;
 }
@@ -98,7 +110,6 @@ h1 span:hover {
   min-height: 7rem;
   margin-left: calc(-1 * var(--font-size-margin));
   padding: 1.5rem var(--font-size-margin);
-  border-bottom: 1px solid var(--color-card);
   color: var(--color-text);
   opacity: 0;
   text-decoration: none;
@@ -126,18 +137,16 @@ h1 span:hover {
   opacity: 1;
 }
 
-.home-sections h3,
-.home-sections p {
-  margin: 0;
-}
-
 .home-sections h3 {
   font-size: var(--font-size-h3);
+  margin: 0;
 }
 
 .home-sections p {
   font-size: var(--font-size-body);
   text-align: right;
+  margin: 0;
+  text-align: left;
 }
 
 @media (max-width: 600px) {
@@ -146,14 +155,50 @@ h1 span:hover {
     flex-direction: column;
     justify-content: center;
   }
-
-  .home-sections p {
-    text-align: left;
-  }
 }
 
 @media (hover: none) {
   .home-sections > a {
     opacity: 1;
   }
+}
+
+.animal-card {
+  flex-direction: column;
+  min-height: 0;
+  max-width: 30rem;
+  padding: 1rem;
+  gap: 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 0px;
+  border-radius: 18px;
+  text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.animal-card:hover,
+.animal-card:focus-visible {
+  background: var(--color-text-w);
+}
+
+.animal-card h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 2rem;
+  text-align: center;
+}
+
+.animal-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.animal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 24rem));
+  justify-content: center;
+  margin: 2rem auto;
 }
