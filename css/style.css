@@ -75,8 +75,9 @@ h1 {
 header p {
   font-size: var(--font-size-h3);
   text-align: center;
-  margin: 0;
+  margin: 2rem auto;
   letter-spacing: 2px;
+
 }
 
 h1 span {
@@ -166,7 +167,7 @@ h1 span:hover {
 .animal-card {
   flex-direction: column;
   min-height: 0;
-  max-width: 30rem;
+  max-width: 20rem;
   padding: 1rem;
   gap: 0.75rem;
   background: rgba(0, 0, 0, 0.2);
@@ -198,7 +199,7 @@ h1 span:hover {
 
 .animal-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 24rem));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 23rem), 15rem));
   justify-content: center;
-  margin: 2rem auto;
+  margin: 3rem auto;
 }
