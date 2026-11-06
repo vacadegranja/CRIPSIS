@@ -7,7 +7,7 @@
   --color-accent-t: #868c3f;
   --color-accent-w: #6087a9;
   --color-text-a: #bc913b;
-  --color-text-t: #767e25;
+  --color-text-t: #6b6f23;
   --color-text-w: #2d7ab3;
   --color-card: rgba(0, 0, 0, 0);
   --color-dark: #0a196600;
@@ -88,7 +88,7 @@ header p {
 }
 
 h1 span {
-  transition: opacity 0.6s ease, filter 0.6s ease;
+  transition: opacity 1s ease, filter 1s ease;
 }
 
 h1 span:nth-child(1) { opacity: 0; stroke: none; }
