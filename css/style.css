@@ -63,6 +63,13 @@ img {
   margin: 1rem auto 0;
   border-radius: 10px;
 }
+
+svg {
+  width: 2.5rem;
+  height: 2.5rem;
+  fill: var(--color-text);
+}
+
 h1 {
   font-family: var(--font-family-head);
   font-size: var(--font-size-h1);
