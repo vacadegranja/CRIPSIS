@@ -177,8 +177,8 @@ h1 span:hover {
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-.animal-card:hover,
-.animal-card:focus-visible {
+.animal-card-w:hover,
+.animal-card-w:focus-visible {
   background: var(--color-text-w);
 }
 
