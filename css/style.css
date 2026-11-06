@@ -184,7 +184,7 @@ h1 span:hover {
 
 .animal-card h2 {
   margin: 0;
-  color: var(--color-text);
+  color: var(--color-background);
   font-size: 2rem;
   text-align: center;
 }
