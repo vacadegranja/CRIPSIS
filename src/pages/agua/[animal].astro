@@ -1,0 +1,47 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import LetterTitle from "../../components/LetterTitle.astro";
+import { animals, elements, nextAnimal } from "../../data/animals.js";
+
+export function getStaticPaths() {
+  return animals
+    .filter((animal) => animal.element === "agua")
+    .map((animal) => ({
+      params: { animal: animal.slug },
+      props: { animal },
+    }));
+}
+
+const { animal } = Astro.props;
+const next = nextAnimal(animal);
+const elementData = elements[animal.element as keyof typeof elements];
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
+const asset = (path: string) => `${base}${path.replace(/^\//, "")}`;
+---
+
+<BaseLayout
+  title={`${animal.name} — CRIPSIS`}
+  description={animal.description}
+  theme={elementData.theme}
+  particleImage={animal.texture}
+>
+  <div class="hero animal-hero" slot="hero">
+    <a class="element-label" href={`${base}${animal.element}/`}>
+      {animal.element}
+    </a>
+    <LetterTitle text={animal.name.toLowerCase()} />
+    <p class="scientific-name">{animal.scientificName}</p>
+    <div class="particle-stage" aria-hidden="true"></div>
+  </div>
+
+  <article class="animal-detail">
+    <img src={asset(animal.cover)} alt={animal.alt} />
+    <div class="animal-copy">
+      <p>{animal.description}</p>
+      <a class="next-animal" href={`${base}${animal.element}/${next.slug}/`}>
+        <span>animal siguiente</span>
+        <strong>{next.name}</strong>
+      </a>
+    </div>
+  </article>
+</BaseLayout>

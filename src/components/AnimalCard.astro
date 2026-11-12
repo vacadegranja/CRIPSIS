@@ -1,0 +1,15 @@
+---
+interface Props {
+  href: string;
+  name: string;
+  image: string;
+  alt: string;
+}
+
+const { href, name, image, alt } = Astro.props;
+---
+
+<a class="animal-card" href={href}>
+  <img src={image} alt={alt} loading="lazy" />
+  <h2>{name}</h2>
+</a>

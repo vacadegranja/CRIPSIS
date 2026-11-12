@@ -1,0 +1,367 @@
+@import url("https://use.typekit.net/dya8vty.css");
+
+:root {
+  --color-background: #000000;
+  --color-text: #ffffff;
+  --color-accent-air: #c4a060;
+  --color-accent-earth: #868c3f;
+  --color-accent-water: #6087a9;
+  --color-text-air: #bc913b;
+  --color-text-earth: #6b6f23;
+  --color-text-water: #dceeff;
+  --font-family: "neulis-sans", sans-serif;
+  --page-margin: clamp(1rem, 2vw, 1.5rem);
+  --title-size: clamp(4.5rem, 12vw, 12rem);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #000;
+  color-scheme: dark;
+  font-family: var(--font-family);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--color-background);
+  color: var(--color-text);
+  transition: background-color 700ms ease, color 700ms ease;
+}
+
+body.home-theme {
+  --color-background: #000000;
+  --color-text: #ffffff;
+}
+
+body.air-theme {
+  --color-background: var(--color-accent-air);
+  --color-text: #241b0d;
+}
+
+body.earth-theme {
+  --color-background: var(--color-accent-earth);
+  --color-text: #151708;
+}
+
+body.water-theme {
+  --color-background: #264e71;
+  --color-text: var(--color-text-water);
+}
+
+a {
+  color: inherit;
+}
+
+.particle-canvas {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.particle-canvas.is-ready {
+  opacity: 0.9;
+}
+
+.site-shell {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  pointer-events: none;
+}
+
+.site-shell a,
+.site-shell button,
+.animal-detail {
+  pointer-events: auto;
+}
+
+.site-header,
+#main-content,
+footer {
+  position: relative;
+}
+
+.top-nav {
+  min-height: 3.5rem;
+  padding: var(--page-margin);
+}
+
+.logo-link {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.logo-link svg {
+  width: 100%;
+  fill: currentColor;
+}
+
+.hero {
+  padding: 1rem var(--page-margin);
+  text-align: center;
+}
+
+.hero-home {
+  display: grid;
+  min-height: 52vh;
+  place-content: center;
+}
+
+.letter-title {
+  margin: 0;
+  font-size: var(--title-size);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: 0.025em;
+  text-transform: lowercase;
+}
+
+.hero-home .letter-title {
+  text-transform: uppercase;
+}
+
+.letter-title span {
+  display: inline-block;
+  opacity: 0.12;
+  filter: blur(3px);
+  transition: opacity 350ms ease, filter 350ms ease, transform 350ms ease;
+  animation: letter-intro 900ms ease backwards;
+}
+
+.letter-title span:nth-child(2n) {
+  animation-delay: 70ms;
+}
+
+.letter-title span:nth-child(3n) {
+  animation-delay: 140ms;
+}
+
+.letter-title span:hover {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(-0.04em);
+}
+
+@keyframes letter-intro {
+  from {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.hero p {
+  margin: 1.5rem auto 0;
+  font-size: clamp(1rem, 2.2vw, 2rem);
+  letter-spacing: 0.08em;
+}
+
+.home-sections {
+  display: grid;
+  margin-top: 2rem;
+}
+
+.home-line {
+  display: flex;
+  min-height: 7rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem var(--page-margin);
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0.28);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  transition: background-color 400ms ease, color 400ms ease;
+}
+
+.home-line h2 {
+  margin: 0;
+  font-size: clamp(1.7rem, 3vw, 3rem);
+  font-weight: 500;
+}
+
+.home-line p {
+  max-width: 34rem;
+  margin: 0;
+  text-align: right;
+}
+
+.home-line-aire:hover,
+.home-line-aire:focus-visible {
+  color: #15100a;
+  background: var(--color-accent-air);
+}
+
+.home-line-tierra:hover,
+.home-line-tierra:focus-visible {
+  color: #111207;
+  background: var(--color-accent-earth);
+}
+
+.home-line-agua:hover,
+.home-line-agua:focus-visible {
+  color: #07131d;
+  background: var(--color-accent-water);
+}
+
+.category-hero {
+  display: grid;
+  min-height: 46vh;
+  place-content: center;
+}
+
+.animal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 22rem));
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 3rem var(--page-margin) 6rem;
+}
+
+.animal-card {
+  padding: 0.85rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.32);
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  transition: transform 250ms ease, background-color 250ms ease;
+}
+
+.animal-card:hover,
+.animal-card:focus-visible {
+  transform: translateY(-0.45rem);
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.animal-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 3;
+  object-fit: cover;
+  border-radius: 0.6rem;
+}
+
+.animal-card h2 {
+  margin: 1rem 0 0.35rem;
+  text-align: center;
+  font-size: 2rem;
+}
+
+.empty-state {
+  min-height: 30vh;
+  margin: 0;
+  padding: 5rem var(--page-margin);
+  text-align: center;
+}
+
+.animal-hero {
+  min-height: calc(100vh - 3.5rem);
+}
+
+.element-label {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.scientific-name {
+  font-style: italic;
+}
+
+.particle-stage {
+  min-height: 54vh;
+}
+
+.animal-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
+  gap: clamp(1.5rem, 5vw, 5rem);
+  align-items: center;
+  max-width: 80rem;
+  margin: 0 auto 5rem;
+  padding: clamp(1rem, 4vw, 4rem);
+  border-radius: 1.25rem;
+  background: rgba(0, 0, 0, 0.64);
+  color: #fff;
+  backdrop-filter: blur(18px);
+}
+
+.animal-detail > img {
+  width: 100%;
+  border-radius: 0.8rem;
+}
+
+.animal-copy > p {
+  font-size: clamp(1.1rem, 1.8vw, 1.45rem);
+  line-height: 1.55;
+}
+
+.next-animal {
+  display: inline-flex;
+  flex-direction: column;
+  margin-top: 2rem;
+  text-decoration: none;
+}
+
+.next-animal span {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.next-animal strong {
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 500;
+}
+
+footer {
+  padding: 2rem var(--page-margin);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .home-line {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-line p {
+    text-align: left;
+  }
+
+  .animal-detail {
+    grid-template-columns: 1fr;
+    margin-inline: var(--page-margin);
+  }
+
+  .particle-stage {
+    min-height: 45vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
