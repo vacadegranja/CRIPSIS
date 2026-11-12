@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import LetterTitle from "../components/LetterTitle.astro";
+import { elements } from "../data/animals.js";
+
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
+const elementKeys = ["aire", "tierra", "agua"] as const;
+const entries = elementKeys.map((key) => ({
+  key,
+  ...elements[key],
+}));
+---
+
+<BaseLayout
+  title="CRIPSIS"
+  particleImage="img/camaleon.png"
+  theme="home-theme"
+  home
+>
+  <div class="hero hero-home" slot="hero">
+    <LetterTitle text="CRIPSIS" />
+    <p>imperceptibilidad a los sentidos</p>
+  </div>
+
+  <nav class="home-sections" aria-label="Elementos">
+    {
+      entries.map((element) => (
+        <a
+          class={`home-line home-line-${element.key}`}
+          href={`${base}${element.key}/`}
+        >
+          <h2>{element.name}</h2>
+          <p>{element.description}</p>
+        </a>
+      ))
+    }
+  </nav>
+</BaseLayout>

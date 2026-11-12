@@ -1,0 +1,57 @@
+---
+import { ClientRouter } from "astro:transitions";
+import ParticleCanvas from "../components/ParticleCanvas.astro";
+import Logo from "../components/Logo.astro";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  theme?: string;
+  particleImage: string;
+  home?: boolean;
+}
+
+const {
+  title,
+  description = "CRIPSIS — imperceptibilidad a los sentidos",
+  theme = "home-theme",
+  particleImage,
+  home = false,
+} = Astro.props;
+
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
+const asset = (path: string) => `${base}${path.replace(/^\//, "")}`;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#000000" />
+    <title>{title}</title>
+    <ClientRouter />
+  </head>
+  <body
+    class:list={[theme, { "home-page": home }]}
+    data-particle-image={asset(particleImage)}
+  >
+    <ParticleCanvas />
+    <div class="site-shell">
+      <header class="site-header">
+        <nav class="top-nav" aria-label="Navegación principal">
+          {!home && <Logo href={base} />}
+        </nav>
+        <slot name="hero" />
+      </header>
+      <main id="main-content">
+        <slot />
+      </main>
+      <footer>
+        <p>&copy; 2026 CRIPSIS. Todos los derechos reservados.</p>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+export const PARTICLE_CONFIG = Object.freeze({
+  count: 22000,
+  pointSize: 2.15,
+  imageScale: 0.72,
+  transitionDuration: 1350,
+  transitionNoise: 0.48,
+  transitionDepth: 0.7,
+  hoverRadius: 0.2,
+  hoverStrength: 0.22,
+  hoverRecovery: 0.075,
+  idleNoise: 0.018,
+  idleSpeed: 0.28,
+  alphaThreshold: 0.12,
+  luminanceThreshold: 0,
+  minimumBrightness: 0.12,
+  sampleResolution: 300,
+  maxPixelRatio: 1.75,
+});

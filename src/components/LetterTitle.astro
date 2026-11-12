@@ -1,0 +1,13 @@
+---
+interface Props {
+  text: string;
+  level?: 1 | 2;
+}
+
+const { text, level = 1 } = Astro.props;
+const Tag = `h${level}` as "h1" | "h2";
+---
+
+<Tag class="letter-title" aria-label={text}>
+  {text.split("").map((letter) => <span aria-hidden="true">{letter}</span>)}
+</Tag>
