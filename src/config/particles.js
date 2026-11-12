@@ -11,7 +11,8 @@ export const PARTICLE_CONFIG = Object.freeze({
   idleNoise: 0.018,
   idleSpeed: 0.28,
   alphaThreshold: 0.12,
-  luminanceThreshold: 0.035,
+  luminanceThreshold: 0,
+  minimumBrightness: 0.12,
   sampleResolution: 300,
   maxPixelRatio: 1.75,
 });
