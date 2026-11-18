@@ -1,5 +1,13 @@
 @import url("https://use.typekit.net/dya8vty.css");
 
+
+@font-face {
+    font-family: 'cripsis';
+    src: url('cripsis-regular-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+
+}
 :root {
   --color-background: #000000;
   --color-text: #ffffff;
@@ -13,7 +21,7 @@
   --color-dark: #0a196600;
 
   --font-family-base: "neulis-sans", sans-serif;
-  --font-family-head: "neulis-sans", sans-serif;
+  --font-family-head: "cripsis", sans-serif;
 
   --font-size-body: max(1.5vw, 1rem);
   --font-size-h1: max(10vw, 2rem);
@@ -89,6 +97,7 @@ h1 {
   margin: 0;
   letter-spacing: 2px;
   text-align: center;
+  font-weight: normal;
 
 }
 header p {
