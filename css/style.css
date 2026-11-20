@@ -70,7 +70,7 @@ body.home-page {
 p {
   font-size: var(--font-size-p);
   line-height: var(--font-line-height);
-  margin: 0.75rem 0 0;
+  margin: 0.75rem;
   text-align: center;
   letter-spacing: 1px;
   margin-top: 5rem;
@@ -231,9 +231,11 @@ h1 span.is-hovered {
   body.earth-theme,
   body.air-theme,
   body.agua-theme,
-  body.home-page {
-    transition-duration: 0.01ms;
-    animation-duration: 0.01ms;
+  body.home-page,
+  .related-modes button,
+  .related-grid .animal-card {
+    transition-duration: 0.02ms;
+    animation-duration: 0.02ms;
   }
 }
 
@@ -255,6 +257,16 @@ h1 span.is-hovered {
   background: var(--color-text-w);
 }
 
+.animal-card-a:hover,
+.animal-card-a:focus-visible {
+  background: var(--color-text-a);
+}
+
+.animal-card-t:hover,
+.animal-card-t:focus-visible {
+  background: var(--color-text-t);
+}
+
 .animal-card h2 {
   margin: 0;
   color: var(--color-background);
@@ -265,6 +277,7 @@ h1 span.is-hovered {
 .animal-card img {
   display: block;
   width: 100%;
+  max-width: 100%;
   aspect-ratio: 5 / 3;
   object-fit: cover;
   border-radius: 10px;
@@ -272,7 +285,203 @@ h1 span.is-hovered {
 
 .animal-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 23rem), 15rem));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 20rem));
   justify-content: center;
+  gap: 1.25rem;
   margin: 3rem auto;
+  padding-inline: 1rem;
+}
+
+.animal-details {
+  max-width: 65rem;
+  margin: 3rem auto;
+}
+
+.animal-details h2 {
+  font-size: var(--font-size-h3);
+  margin: 2.5rem 0 0.75rem;
+  text-align: center;
+}
+
+.animal-details p {
+  margin: 0;
+  max-width: 60rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.animal-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.animal-facts div {
+  padding: 1rem;
+  border: 2px solid var(--color-text);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.animal-facts dt {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.animal-facts dd {
+  margin: 0;
+  font-size: var(--font-size-p);
+}
+
+.animal-hero-image {
+  width: min(100%, 58rem);
+  max-width: 100%;
+  max-height: 55vh;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.element-label {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: inherit;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.related-section {
+  max-width: 90rem;
+  margin: 4rem auto 3rem;
+}
+
+.related-section > h2,
+.related-section > p {
+  text-align: center;
+}
+
+.related-section > h2 {
+  font-size: var(--font-size-h3);
+}
+
+.related-section > p {
+  margin: 0.75rem;
+}
+
+.related-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.related-modes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.related-modes button {
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.3);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  opacity: 0.75;
+  transform: translateY(0);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.related-modes button:hover,
+.related-modes button:focus-visible {
+  background: var(--color-text);
+  color: var(--color-background);
+  opacity: 1;
+  transform: translateY(-0.2rem);
+}
+
+.related-modes button[aria-pressed="true"] {
+  background: var(--color-text);
+  color: var(--color-background);
+  opacity: 1;
+}
+
+.related-status {
+  min-height: 1.5em;
+  margin: 1rem 0 0;
+  font-size: 1rem;
+}
+
+.related-grid {
+  margin-top: 1rem;
+}
+
+.related-grid .animal-card {
+  opacity: 1;
+  transition:
+    opacity 0.25s ease,
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.related-grid .animal-card.is-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.related-grid .animal-card.is-entering {
+  opacity: 0;
+}
+
+.related-grid .animal-card.is-entering.is-visible {
+  opacity: 1;
+}
+
+.animal-card[hidden],
+.related-empty[hidden] {
+  display: none;
+}
+
+.related-empty {
+  margin: 2rem;
+  text-align: center;
+}
+
+.home-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.home-link svg {
+  width: 3.25rem;
+  height: 2.8rem;
+  margin: 0;
+  fill: currentColor;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.home-link:hover svg,
+.home-link:focus-visible svg {
+  opacity: 0.75;
+  transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .animal-facts {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  }
+
+  .related-modes button {
+    padding-inline: 0.75rem;
+    font-size: 0.95rem;
+  }
 }
