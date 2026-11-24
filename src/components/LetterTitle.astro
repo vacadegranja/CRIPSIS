@@ -9,5 +9,9 @@ const Tag = `h${level}` as "h1" | "h2";
 ---
 
 <Tag class="letter-title" aria-label={text}>
-  {text.split("").map((letter) => <span aria-hidden="true">{letter}</span>)}
+  {text.split(" ").map((word) =>
+  <span aria-hidden="true">
+    {word.split("").map((letter) => <span aria-hidden="true">{letter}</span>)}
+  </span>
+  )}
 </Tag>
