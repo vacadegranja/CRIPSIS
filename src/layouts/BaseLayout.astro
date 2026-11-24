@@ -1,23 +1,27 @@
 ---
 import { ClientRouter } from "astro:transitions";
-import ParticleCanvas from "../components/ParticleCanvas.astro";
 import Logo from "../components/Logo.astro";
+import OrganicPattern from "../components/OrganicPattern.astro";
 import "../styles/global.css";
 
 interface Props {
   title: string;
   description?: string;
   theme?: string;
-  particleImage: string;
   home?: boolean;
+  cam?: boolean;
+  patternColors?: string[];
+  patternVariant?: number;
 }
 
 const {
   title,
   description = "CRIPSIS — imperceptibilidad a los sentidos",
   theme = "home-theme",
-  particleImage,
   home = false,
+  cam = false,
+  patternColors,
+  patternVariant = 0,
 } = Astro.props;
 
 const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
@@ -35,14 +39,24 @@ const asset = (path: string) => `${base}${path.replace(/^\//, "")}`;
     <ClientRouter />
   </head>
   <body
-    class:list={[theme, { "home-page": home }]}
-    data-particle-image={asset(particleImage)}
+    class:list={[theme, { "home-page": home, "cam-page-body": cam }]}
   >
-    <ParticleCanvas />
+    {!home && !cam && patternColors && (
+      <OrganicPattern
+        colors={patternColors}
+        variant={patternVariant}
+        class="site-pattern"
+      />
+    )}
     <div class="site-shell">
       <header class="site-header">
         <nav class="top-nav" aria-label="Navegación principal">
           {!home && <Logo href={base} />}
+          {!home && (
+            <a class="cam-link" href={`${base}cam/`} aria-label="Abrir experiencia con cámara">
+              cam
+            </a>
+          )}
         </nav>
         <slot name="hero" />
       </header>

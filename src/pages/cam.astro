@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
+---
+
+<BaseLayout title="CAM — CRIPSIS" theme="home-theme" cam>
+  <section class="cam-page" aria-label="Experiencia con cámara">
+    <iframe
+      src={`${base}cam/app.html`}
+      title="Experiencia interactiva de rostro y partículas"
+      allow="camera; fullscreen"
+    ></iframe>
+  </section>
+</BaseLayout>
+
+<style>
+  .cam-page {
+    width: 100%;
+    height: 100%;
+  }
+
+  .cam-page iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+</style>

@@ -13,26 +13,118 @@ const entries = elementKeys.map((key) => ({
 
 <BaseLayout
   title="CRIPSIS"
-  particleImage="img/camaleon.png"
   theme="home-theme"
   home
 >
   <div class="hero hero-home" slot="hero">
     <LetterTitle text="CRIPSIS" />
-    <p>imperceptibilidad a los sentidos</p>
+    <p class="home-tagline">imperceptibilidad a los sentidos</p>
   </div>
 
-  <nav class="home-sections" aria-label="Elementos">
+  <section class="home-sections">
     {
       entries.map((element) => (
         <a
           class={`home-line home-line-${element.key}`}
           href={`${base}${element.key}/`}
+          aria-label={`${element.name}: ${element.description}`}
         >
-          <h2>{element.name}</h2>
+          <h3>{element.name}</h3>
           <p>{element.description}</p>
         </a>
       ))
     }
-  </nav>
+  </section>
 </BaseLayout>
+
+<script>
+  import { navigate } from "astro:transitions/client";
+
+  function initializeHome() {
+    if (!document.body.classList.contains("home-page")) return;
+
+    const homeSections = document.querySelector<HTMLElement>(".home-sections");
+    if (!homeSections || homeSections.dataset.interactionsReady === "true") return;
+    homeSections.dataset.interactionsReady = "true";
+
+    const titleLetters = Array.from(
+      document.querySelectorAll<HTMLElement>(".hero-home .letter-title span"),
+    );
+    titleLetters.forEach((letter) => {
+      letter.addEventListener("pointerenter", () => {
+        letter.classList.add("is-hovered");
+      });
+      letter.addEventListener("pointerleave", () => {
+        letter.classList.remove("is-hovered");
+      });
+      letter.addEventListener("focus", () => {
+        letter.classList.add("is-hovered");
+      });
+      letter.addEventListener("blur", () => {
+        letter.classList.remove("is-hovered");
+      });
+    });
+
+    homeSections.addEventListener("pointerenter", () => {
+      document.body.classList.add("is-choice-active");
+    });
+    homeSections.addEventListener("pointerleave", () => {
+      if (!document.body.classList.contains("is-leaving")) {
+        document.body.classList.remove("is-choice-active");
+      }
+    });
+    homeSections.addEventListener("focusin", () => {
+      document.body.classList.add("is-choice-active");
+    });
+    homeSections.addEventListener("focusout", (event) => {
+      if (!(event.relatedTarget instanceof Node && homeSections.contains(event.relatedTarget))) {
+        document.body.classList.remove("is-choice-active");
+      }
+    });
+
+    document.querySelectorAll<HTMLAnchorElement>(".home-line").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        if (
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        ) return;
+
+        event.preventDefault();
+        if (document.body.classList.contains("is-leaving")) return;
+
+        const href = link.href;
+        const bounds = link.getBoundingClientRect();
+        const transition = document.createElement("div");
+        const selectedElement = Array.from(link.classList)
+          .find((className) => className.startsWith("home-line-"))
+          ?.replace("home-line-", "");
+        if (!selectedElement) return;
+
+        transition.className = `home-transition home-transition--${selectedElement}`;
+        transition.setAttribute("aria-hidden", "true");
+        transition.style.transform =
+          `translate3d(${bounds.left}px, ${bounds.top}px, 0) ` +
+          `scale(${bounds.width / window.innerWidth}, ${bounds.height / window.innerHeight})`;
+        document.body.append(transition);
+
+        document.body.classList.add("is-leaving");
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            transition.classList.add("is-expanded");
+          });
+        });
+
+        window.setTimeout(() => {
+          navigate(href);
+        }, 680);
+      });
+    });
+  }
+
+  initializeHome();
+  document.addEventListener("astro:page-load", initializeHome);
+</script>

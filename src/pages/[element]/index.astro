@@ -22,27 +22,30 @@ const asset = (path: string) => `${base}${path.replace(/^\//, "")}`;
   title={`${elementData.name} — CRIPSIS`}
   description={elementData.description}
   theme={elementData.theme}
-  particleImage={elementData.texture}
+  patternColors={elementData.patternColors}
+  patternVariant={elementData.patternVariant}
 >
-  <div class="hero category-hero" slot="hero">
-    <LetterTitle text={elementData.name} />
-    <p>{elementData.description}</p>
-  </div>
+  <section class="organic-section organic-section--element" data-pattern-section>
+    <div class="hero category-hero">
+      <LetterTitle text={elementData.name} />
+      <p>{elementData.description}</p>
+    </div>
 
-  {
-    animals.length ? (
-      <section class="animal-grid" aria-label={`Animales de ${elementData.name}`}>
-        {animals.map((animal) => (
-          <AnimalCard
-            href={`${base}${element}/${animal.slug}/`}
-            name={animal.name}
-            image={asset(animal.cover)}
-            alt={animal.alt}
-          />
-        ))}
-      </section>
-    ) : (
-      <p class="empty-state">Próximamente aparecerán animales de {elementData.name}.</p>
-    )
-  }
+    {
+      animals.length ? (
+        <section class="animal-grid" aria-label={`Animales de ${elementData.name}`}>
+          {animals.map((animal) => (
+            <AnimalCard
+              href={`${base}${element}/${animal.slug}/`}
+              name={animal.name}
+              image={animal.cover ? asset(animal.cover) : null}
+              alt={animal.alt}
+            />
+          ))}
+        </section>
+      ) : (
+        <p class="empty-state">Próximamente aparecerán animales de {elementData.name}.</p>
+      )
+    }
+  </section>
 </BaseLayout>

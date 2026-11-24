@@ -64,7 +64,7 @@ Imita la apariencia de una flor para atraer y atrapar insectos.	Selvas tropicale
 Visión	
 Caza y supervivencia	
 Ocultarse y pretender	
-Aire	
+Tierra	
 Camuflaje y mimetismo
 
 Mariposa Caligo común	
@@ -297,7 +297,7 @@ Visión
 Supervivencia	
 Advertir	
 Agua	
-Aposematismo
+Camuflaje y aposematismo
 
 Murciélago pálido	
 Antrozous pallidus	
@@ -354,4 +354,94 @@ Visión
 Caza y supervivencia	
 Ocultarse	
 Agua	
+Camuflaje
+
+Jaguar
+Panthera onca
+Las manchas de su pelaje le permiten confundirse con las luces y sombras de la vegetación, ayudándole a acercarse sigilosamente a sus presas.
+Selvas tropicales, bosques, manglares y humedales de América.
+Visión
+Caza y supervivencia
+Ocultarse
+Tierra
+Camuflaje
+
+Cebra común
+Equus quagga
+Sus rayas crean un patrón visual que dificulta a los depredadores distinguir a un individuo dentro de la manada y pueden confundir la percepción del movimiento.
+Sabanas, pastizales y bosques abiertos de África.
+Visión
+Supervivencia
+Confundir
+Tierra
+Camuflaje
+
+Drongo de cola larga
+Dicrurus paradiseus
+Imita los llamados de alarma de otras aves para alertarlas o atraerlas cuando se enfrenta a un peligro.
+Selvas tropicales del sur y sureste de Asia.
+Audición
+Supervivencia
+Imitar
+Aire
+Mimetismo
+
+Abejorro cuco
+Bombus vestalis
+Ajusta su olor químicamente para parecerse a la colonia de abejorros que invade.
+Praderas y jardines de Europa.
+Olfato
+Reproducción
+Imitar
+Aire
+Mimetismo
+
+Pez lima arlequín
+Oxymonacanthus longirostris
+Su alimentación modifica su olor corporal, haciéndolo parecido al de los corales que consume y dificultando que sus depredadores lo detecten.
+Arrecifes de coral del Indo-Pacífico.
+Olfato
+Supervivencia
+Ocultarse
+Agua
+Camuflaje
+
+Cuervo común
+Corvus corax
+Imita sonidos de otras aves y de su entorno para comunicarse y engañar.
+Bosques, montañas y zonas abiertas.
+Audición
+Supervivencia
+Imitar
+Aire
+Mimetismo
+
+Dragón azul
+Glaucus atlanticus
+Su coloración azulada le permite confundirse con la superficie del océano, mientras que sus tonos plateados y azules también pueden funcionar como advertencia.
+Aguas superficiales de mares tropicales y templados.
+Visión
+Supervivencia
+Ocultarse y advertir
+Agua
+Camuflaje y aposematismo
+
+Sepia extravagante
+Metasepia pfefferi
+Modifica su coloración para confundirse con el fondo marino y, cuando se siente amenazada, muestra colores intensos como señal de advertencia.
+Fondos arenosos y arrecifes del Indo-Pacífico.
+Visión
+Caza y supervivencia
+Ocultarse y advertir
+Agua
+Camuflaje y aposematismo
+
+Chotacabras europeo
+Caprimulgus europaeus
+Su plumaje moteado imita los tonos y las texturas de la corteza y las hojas secas, haciéndolo difícil de detectar cuando descansa.
+Bosques abiertos y matorrales.
+Visión
+Supervivencia
+Ocultarse
+Aire
 Camuflaje

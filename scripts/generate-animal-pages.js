@@ -47,6 +47,15 @@ const metadataRows = [
   ["Acanthurus pyroferus", "pez-cirujano-imitador", "acanthurus_pyroferus.jpg", "Peces", "Acanthuridae"],
   ["Bothus mancus", "lenguado-pavo-real", "bothus_mancus.jpg", "Peces", "Bothidae"],
   ["Histrio histrio", "pez-sargazo", "Histrio-histrio.jpg", "Peces", "Antennariidae"],
+  ["Panthera onca", "jaguar", null, "Mamíferos", "Felidae"],
+  ["Equus quagga", "cebra-comun", null, "Mamíferos", "Equidae"],
+  ["Dicrurus paradiseus", "drongo-cola-larga", null, "Aves", "Dicruridae"],
+  ["Bombus vestalis", "abejorro-cuco", null, "Insectos", "Apidae"],
+  ["Oxymonacanthus longirostris", "pez-lima-arlequin", null, "Peces", "Monacanthidae"],
+  ["Corvus corax", "cuervo-comun", null, "Aves", "Corvidae"],
+  ["Glaucus atlanticus", "dragon-azul", null, "Moluscos", "Glaucidae"],
+  ["Metasepia pfefferi", "sepia-extravagante", null, "Moluscos", "Sepiidae"],
+  ["Caprimulgus europaeus", "chotacabras-europeo", null, "Aves", "Caprimulgidae"],
 ];
 const metadataByScientificName = new Map(
   metadataRows.map(([scientificName, slug, image, group, family]) => [
@@ -96,7 +105,7 @@ function animalCard(animal, fromDetail = false) {
   const hidden = fromDetail && animal.hidden ? " hidden" : "";
 
   return `<a class="animal-card animal-card-${category.cardClass}" href="${href}"${relatedData}${hidden}>
-        <img src="${assetPath(animal.image)}" alt="${escapeHtml(animal.alt)}" loading="lazy">
+        ${animal.image ? `<img src="${assetPath(animal.image)}" alt="${escapeHtml(animal.alt)}" loading="lazy">` : '<div class="animal-image-missing">Imagen no disponible</div>'}
         <h2>${escapeHtml(animal.name)}</h2>
       </a>`;
 }
@@ -190,7 +199,7 @@ function animalPage(animal, allAnimals) {
         <a class="element-label" href="./index.html">${category.label}</a>
         ${letterTitle(animal.name.toLowerCase(), category.titleId)}
         <p><em>${escapeHtml(animal.scientificName)}</em></p>
-        <img class="animal-hero-image" src="${assetPath(animal.image)}" alt="${escapeHtml(animal.alt)}">
+        ${animal.image ? `<img class="animal-hero-image" src="${assetPath(animal.image)}" alt="${escapeHtml(animal.alt)}">` : '<div class="animal-image-missing animal-hero-image">Imagen no disponible</div>'}
       </div>
     </header>
     <main>
@@ -243,7 +252,7 @@ const animals = blocks.map((block, index) => {
   if (!sections[element]) {
     throw new Error(`Elemento no reconocido para ${scientificName}: ${rawElement}.`);
   }
-  if (!existsSync(join(root, "img", metadata.image))) {
+  if (metadata.image && !existsSync(join(root, "img", metadata.image))) {
     throw new Error(`No existe la imagen de ${scientificName}: ${metadata.image}.`);
   }
 

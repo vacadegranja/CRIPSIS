@@ -1,0 +1,175 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import LetterTitle from "../../components/LetterTitle.astro";
+import { animals, elements } from "../../data/animals.js";
+
+export function getStaticPaths() {
+  return animals.map((animal) => ({
+    params: { element: animal.element, animal: animal.slug },
+    props: { animal },
+  }));
+}
+
+const { animal } = Astro.props;
+const elementData = elements[animal.element as keyof typeof elements];
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
+const asset = (path: string) => `${base}${path.replace(/^\//, "")}`;
+const splitAdaptations = (value: string) =>
+  value
+    .toLowerCase()
+    .split(/\s+y\s+/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" ");
+const relatedAnimals = animals.filter((item) => item.slug !== animal.slug);
+---
+
+<BaseLayout
+  title={`${animal.name} — CRIPSIS`}
+  description={animal.description}
+  theme={elementData.theme}
+  patternColors={elementData.patternColors}
+  patternVariant={elementData.patternVariant}
+>
+  <section class="organic-section organic-section--animal" data-pattern-section>
+    <div class="hero animal-hero">
+      <a class="element-label" href={`${base}${animal.element}/`}>
+        {animal.element}
+      </a>
+      <LetterTitle text={animal.name.toLowerCase()} />
+      <p class="scientific-name">{animal.scientificName}</p>
+      {animal.cover ? (
+        <img
+          class:list={[
+            "animal-hero-image",
+            { "animal-hero-image--contain": animal.slug === "dragon-de-mar" },
+          ]}
+          src={asset(animal.cover)}
+          alt={animal.alt}
+        />
+      ) : (
+        <div class="animal-image-missing animal-hero-image" aria-label="Imagen no disponible">
+          Imagen no disponible
+        </div>
+      )}
+    </div>
+
+    <article class="animal-details">
+        <section>
+          <h2>¿Qué hace?</h2>
+          <p>{animal.description}</p>
+        </section>
+        <section>
+          <h2>¿Dónde habita?</h2>
+          <p>{animal.habitat}</p>
+        </section>
+        <dl class="animal-facts">
+          <div><dt>Sentido</dt><dd>{animal.sense}</dd></div>
+          <div><dt>Uso</dt><dd>{animal.use}</dd></div>
+          <div><dt>Acción</dt><dd>{animal.action}</dd></div>
+          <div><dt>Elemento</dt><dd>{elementData.name}</dd></div>
+          <div><dt>Tipo de adaptación</dt><dd>{animal.adaptation}</dd></div>
+        </dl>
+    </article>
+
+    <section
+      class="related-section"
+      aria-labelledby="related-title"
+      data-related
+      data-current-element={animal.element}
+      data-current-group={animal.group}
+      data-current-family={animal.family}
+      data-current-adaptations={splitAdaptations(animal.adaptation)}
+    >
+      <h2 id="related-title">Animales relacionados</h2>
+      <p>Elige un criterio para ver animales relacionados.</p>
+      <div class="related-controls">
+        <div class="related-modes" role="group" aria-label="Tipo de relación">
+          <button type="button" data-related-mode="element" aria-pressed="true">Elemento</button>
+          <button type="button" data-related-mode="adaptation" aria-pressed="false">Adaptación</button>
+          <button type="button" data-related-mode="taxonomy" aria-pressed="false">Grupo o familia</button>
+        </div>
+      </div>
+      <p class="related-status" data-related-status aria-live="polite"></p>
+      <div class="animal-grid related-grid" data-related-grid>
+        {relatedAnimals.map((item) => (
+          <a
+            class="animal-card"
+            href={`${base}${item.element}/${item.slug}/`}
+            data-related-card
+            data-element={item.element}
+            data-adaptations={splitAdaptations(item.adaptation)}
+            data-group={item.group}
+            data-family={item.family}
+            hidden={item.element !== animal.element}
+          >
+            {item.cover ? <img src={asset(item.cover)} alt={item.alt} loading="lazy" /> : <div class="animal-image-missing" aria-label="Imagen no disponible">Imagen no disponible</div>}
+            <h2>{item.name}</h2>
+          </a>
+        ))}
+      </div>
+      <p class="related-empty" data-related-empty hidden>No hay animales relacionados.</p>
+    </section>
+  </section>
+
+  <script>
+    function initializeRelatedAnimals() {
+      document.querySelectorAll<HTMLElement>("[data-related]").forEach((root) => {
+        if (root.dataset.relatedReady) return;
+        root.dataset.relatedReady = "true";
+
+        const cards = Array.from(root.querySelectorAll<HTMLElement>("[data-related-card]"));
+        const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-related-mode]"));
+        const emptyState = root.querySelector<HTMLElement>("[data-related-empty]");
+        const status = root.querySelector<HTMLElement>("[data-related-status]");
+        if (!emptyState || !status) return;
+
+        const applyFilter = (mode: string) => {
+          const currentAdaptations = (root.dataset.currentAdaptations ?? "").split(" ");
+          let visibleCount = 0;
+
+          cards.forEach((card) => {
+            let matches = false;
+            if (mode === "element") {
+              matches = card.dataset.element === root.dataset.currentElement;
+            } else if (mode === "adaptation") {
+              matches = (card.dataset.adaptations ?? "")
+                .split(" ")
+                .some((adaptation) => currentAdaptations.includes(adaptation));
+            } else {
+              matches =
+                card.dataset.group === root.dataset.currentGroup ||
+                card.dataset.family === root.dataset.currentFamily;
+            }
+
+            if (matches) {
+              card.hidden = false;
+              visibleCount += 1;
+            } else {
+              card.hidden = true;
+            }
+          });
+
+          emptyState.hidden = visibleCount > 0;
+          status.textContent = `${visibleCount} ${
+            visibleCount === 1 ? "animal relacionado" : "animales relacionados"
+          }`;
+        };
+
+        buttons.forEach((button) => {
+          button.addEventListener("click", () => {
+            buttons.forEach((item) => {
+              item.setAttribute("aria-pressed", String(item === button));
+            });
+            applyFilter(button.dataset.relatedMode ?? "element");
+          });
+        });
+
+        applyFilter("element");
+      });
+    }
+
+    initializeRelatedAnimals();
+    document.addEventListener("astro:page-load", initializeRelatedAnimals);
+  </script>
+</BaseLayout>

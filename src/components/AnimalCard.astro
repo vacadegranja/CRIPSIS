@@ -2,7 +2,7 @@
 interface Props {
   href: string;
   name: string;
-  image: string;
+  image: string | null;
   alt: string;
 }
 
@@ -10,6 +10,6 @@ const { href, name, image, alt } = Astro.props;
 ---
 
 <a class="animal-card" href={href}>
-  <img src={image} alt={alt} loading="lazy" />
+  {image ? <img src={image} alt={alt} loading="lazy" /> : <div class="animal-image-missing" aria-label="Imagen no disponible">Imagen no disponible</div>}
   <h2>{name}</h2>
 </a>
