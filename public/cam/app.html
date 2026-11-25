@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Rostro en partículas</title>
+<title>Rostro e imágenes</title>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}
 body{margin:0;background:#07090d;color:#eef2f7;font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;overflow:hidden}
-main{height:100svh;display:grid;grid-template-rows:auto 1fr auto;padding:18px;gap:12px}
+main{height:100svh;display:grid;grid-template-rows:auto 1fr;padding:18px 18px 82px;gap:12px}
 header,footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 h1{font-size:15px;letter-spacing:.14em;text-transform:uppercase;margin:0;font-weight:650}
 small,.hint{color:#9ba6b7}
@@ -21,24 +21,69 @@ button:disabled{opacity:.45;cursor:wait}
 .hint{max-width:680px}
 #message{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,85%);text-align:center;color:#c4ccd8;pointer-events:none}
 #message strong{display:block;color:#f2f5fa;font-size:18px;margin-bottom:6px}
-@media(max-width:600px){main{padding:12px}header{align-items:flex-start}footer{align-items:flex-start;flex-direction:column}}
+.instructions-overlay{position:fixed;z-index:20;inset:0;display:grid;place-items:center;padding:18px;background:rgba(7,9,13,.72);backdrop-filter:blur(12px);opacity:1;visibility:visible;pointer-events:auto;transition:opacity 320ms ease,visibility 320ms ease,backdrop-filter 320ms ease}
+.instructions-overlay.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+.instructions-dialog{position:relative;width:min(560px,calc(100vw - 36px));padding:28px;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:#11161e;box-shadow:0 24px 80px rgba(0,0,0,.45);transform:translateY(0) scale(1);transition:transform 320ms ease,opacity 320ms ease}
+.instructions-overlay.is-hidden .instructions-dialog{opacity:0;transform:translateY(8px) scale(.98)}
+.instructions-dialog h2{margin:0 38px 18px 0;font-size:20px;text-transform:uppercase;letter-spacing:.08em}
+.instructions-dialog ul{margin:0;padding-left:20px;color:#c4ccd8}
+.instructions-dialog li+li{margin-top:9px}
+.instructions-dialog .start-hint{margin:20px 0 0;color:#fff;text-align:center;font-weight:650}
+.help-button{position:fixed;z-index:15;left:18px;bottom:18px;width:44px;height:44px;padding:0;border-radius:50%;font-size:20px;font-weight:700}
+.camera-footer{position:fixed;z-index:15;right:18px;bottom:18px;margin:0}
+.camera-footer button{width:auto}
+@media(max-width:600px){main{padding:12px}header{align-items:flex-start}}
 </style>
 </head>
 <body>
 <main>
-<header><h1>Rostro / partículas</h1><div class="status"><span id="dot" class="dot"></span><small id="state">Cámara apagada</small></div></header>
-<section class="stage"><canvas id="view"></canvas><video id="video" playsinline muted></video><div id="message"><strong>Tu rostro, hecho partículas</strong>Activa la cámara para comenzar. Permite el acceso cuando el navegador lo solicite.</div></section>
-<footer><div class="hint">Dos manos abiertas: March · Dos puños: Miku · Una mano abierta y un puño: Nah. Saca la lengua para expandir la imagen moderadamente. Una mano abierta dispersa el rostro; cierra el puño para reconstruirlo.</div><button id="camera" class="primary">Activar cámara</button></footer>
+<header><div class="status"><span id="dot" class="dot"></span><small id="state">Cámara apagada</small></div></header>
+<section class="stage"><canvas id="view"></canvas><video id="video" playsinline muted></video><div id="message"><strong>Tu rostro e imágenes</strong>Activa la cámara para comenzar. Permite el acceso cuando el navegador lo solicite.</div></section>
 </main>
+<footer class="camera-footer"><button id="camera" class="primary">Activar cámara</button></footer>
+<div class="instructions-overlay" id="instructions" role="dialog" aria-modal="true" aria-labelledby="instructions-title">
+ <div class="instructions-dialog">
+  <h2 id="instructions-title">Instrucciones</h2>
+  <ul>
+   <li>Dos manos abiertas: muestra la imagen de la cebra.</li>
+   <li>Dos puños: muestra la imagen del jaguar.</li>
+   <li>Una mano abierta y un puño: muestra la imagen del pez.</li>
+   <li>Una mano abierta dispersa el rostro; cierra el puño para reconstruirlo.</li>
+  </ul>
+  <p class="start-hint">Haz clic en cualquier lado para empezar</p>
+ </div>
+</div>
+<button class="help-button" id="help-button" type="button" aria-label="Mostrar instrucciones">?</button>
 <script type="module">
 import {FaceLandmarker,FilesetResolver,HandLandmarker} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
 const canvas=document.querySelector('#view'),ctx=canvas.getContext('2d'),video=document.querySelector('#video');
 const cameraBtn=document.querySelector('#camera');
 const state=document.querySelector('#state'),dot=document.querySelector('#dot'),message=document.querySelector('#message');
-const SETTINGS={particleDensity:180,particleLimit:22000,particleMinSize:1,particleSizeRange:1.5,faceScaleX:1.35,faceScaleY:1.35,explosionScaleX:3.8,explosionScaleY:3.2,imageScaleClosed:.8,imageExplosionScale:2.2,mouthOpenThreshold:.055,mouthCloseThreshold:.035,tonguePinkRatio:.12};
-let landmarker=null,handLandmarker=null,stream=null,particles=[],face=null,exploding=false,mouthOpen=false,mouthStrength=0,imageExplosionActive=false,imageExpansion=SETTINGS.imageScaleClosed,imageTarget=null,lastVideoTime=-1,raf=0,mouse={x:-9999,y:-9999},imagePixels={};
+const instructions=document.querySelector('#instructions');
+const helpButton=document.querySelector('#help-button');
+function closeInstructions(){
+ instructions.classList.add('is-hidden');
+}
+function openInstructions(){
+ instructions.classList.remove('is-hidden');
+}
+instructions.addEventListener('click',event=>{
+ if(event.target===instructions)closeInstructions();
+});
+helpButton.addEventListener('click',openInstructions);
+document.addEventListener('click',event=>{
+ if(!instructions.classList.contains('is-hidden')&&!instructions.querySelector('.instructions-dialog').contains(event.target)&&event.target!==helpButton){
+  closeInstructions();
+ }
+});
+const SETTINGS={particleDensity:180,particleLimit:22000,particleMinSize:1,particleSizeRange:1.5,faceScaleX:1.35,faceScaleY:1.35,explosionScaleX:3.8,explosionScaleY:3.2};
+let landmarker=null,handLandmarker=null,stream=null,particles=[],face=null,exploding=false,imageTarget=null,lastVideoTime=-1,raf=0,mouse={x:-9999,y:-9999},imagePixels={};
 const sample=document.createElement('canvas'),sctx=sample.getContext('2d',{willReadFrequently:true});
-const IMAGE_SOURCES={march:'img/march.png',miku:'img/miku.JPG',nah:'img/nah.jpeg'};
+const IMAGE_SOURCES={
+ cebra:'../../img/cebra_pat.jpg',
+ jaguar:'../../img/jaguar_pat.jpg',
+ pez:'../../img/fish_sca.jpg'
+};
 function loadImagePixels(src){
  return new Promise((resolve,reject)=>{
   const image=new Image();
@@ -50,7 +95,7 @@ function loadImagePixels(src){
     imageCanvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
     const imageContext=imageCanvas.getContext('2d',{willReadFrequently:true});
     imageContext.drawImage(image,0,0,imageCanvas.width,imageCanvas.height);
-    resolve({width:imageCanvas.width,height:imageCanvas.height,data:imageContext.getImageData(0,0,imageCanvas.width,imageCanvas.height).data});
+    resolve({canvas:imageCanvas,width:imageCanvas.width,height:imageCanvas.height,data:imageContext.getImageData(0,0,imageCanvas.width,imageCanvas.height).data});
    }catch(error){reject(error)}
   };
   image.onerror=()=>reject(new Error(`No se pudo cargar ${src}`));
@@ -86,47 +131,15 @@ function updateHandGesture(hands){
  if(hands.length>=2){
   const first=getHandPose(hands[0]),second=getHandPose(hands[1]);
   if(first!=='unknown'&&second!=='unknown'){
-   if(first==='open'&&second==='open')imageTarget='march';
-   else if(first==='closed'&&second==='closed')imageTarget='miku';
-   else imageTarget='nah';
+   if(first==='open'&&second==='open')imageTarget='cebra';
+   else if(first==='closed'&&second==='closed')imageTarget='jaguar';
+   else imageTarget='pez';
   }
   exploding=false;
   return;
  }
  const pose=hands.length===1?getHandPose(hands[0]):null;
  exploding=pose==='open';
-}
-function updateTongueGesture(landmarks){
- if(!landmarks){mouthOpen=false;mouthStrength=0;return}
- const mouthGap=Math.abs(landmarks[14].y-landmarks[13].y);
- const faceHeight=Math.max(...landmarks.map(point=>point.y))-Math.min(...landmarks.map(point=>point.y));
- const opening=mouthGap/(faceHeight||1);
- if(opening<=SETTINGS.mouthCloseThreshold){mouthOpen=false;mouthStrength=0;return}
- sample.width=video.videoWidth;sample.height=video.videoHeight;
- sctx.save();sctx.translate(sample.width,0);sctx.scale(-1,1);sctx.drawImage(video,0,0);sctx.restore();
- let pixels;
- try{pixels=sctx.getImageData(0,0,sample.width,sample.height).data}catch(error){mouthOpen=false;mouthStrength=0;return}
- const leftX=Math.min(...landmarks.map(p=>p.x)),rightX=Math.max(...landmarks.map(p=>p.x));
- const faceWidth=(rightX-leftX)*sample.width;
- const mouthCenterX=(1-(landmarks[13].x+landmarks[14].x)/2)*sample.width;
- const lowerLipY=Math.max(landmarks[13].y,landmarks[14].y)*sample.height;
- const regionLeft=Math.max(0,Math.floor(mouthCenterX-faceWidth*.12));
- const regionRight=Math.min(sample.width,Math.ceil(mouthCenterX+faceWidth*.12));
- const regionTop=Math.max(0,Math.floor(lowerLipY-faceHeight*sample.height*.015));
- const regionBottom=Math.min(sample.height,Math.ceil(lowerLipY+faceHeight*sample.height*.12));
- let pinkPixels=0,totalPixels=0;
- for(let y=regionTop;y<regionBottom;y++){
-  for(let x=regionLeft;x<regionRight;x++){
-   const k=(y*sample.width+x)*4,r=pixels[k],g=pixels[k+1],b=pixels[k+2];
-   if(r>75&&g>35&&r-g>12&&r>b*1.08&&r/g>1.12){pinkPixels++}
-   totalPixels++;
-  }
- }
- const pinkRatio=totalPixels?pinkPixels/totalPixels:0;
- const tongueDetected=pinkRatio>SETTINGS.tonguePinkRatio;
- if(tongueDetected&&!mouthOpen)mouthOpen=true;
- else if(!tongueDetected&&mouthOpen)mouthOpen=false;
- mouthStrength=mouthOpen?Math.min(1,pinkRatio/SETTINGS.tonguePinkRatio):0;
 }
 function pointInPolygon(x,y,polygon){
  let inside=false;
@@ -147,17 +160,16 @@ async function start(){
   video.srcObject=stream;await video.play();message.style.display='none';cameraBtn.textContent='Apagar cámara';cameraBtn.disabled=false;setStatus(true,'Cámara activa');loop();
  }catch(e){console.error(e);state.textContent='No se pudo iniciar';cameraBtn.disabled=false;cameraBtn.textContent='Reintentar';message.style.display='block';message.innerHTML='<strong>No se pudo iniciar</strong>Comprueba los permisos de cámara, la conexión y que las imágenes de img estén disponibles.'}
 }
-function stop(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;cancelAnimationFrame(raf);face=null;exploding=false;mouthOpen=false;mouthStrength=0;imageTarget=null;lastVideoTime=-1;cameraBtn.textContent='Activar cámara';setStatus(false,'Cámara apagada');message.style.display='block';message.innerHTML='<strong>Tu rostro, hecho partículas</strong>Activa la cámara para comenzar.';drawIdle()}
+function stop(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;cancelAnimationFrame(raf);face=null;exploding=false;imageTarget=null;lastVideoTime=-1;cameraBtn.textContent='Activar cámara';setStatus(false,'Cámara apagada');message.style.display='block';message.innerHTML='<strong>Tu rostro e imágenes</strong>Activa la cámara para comenzar.';drawIdle()}
 cameraBtn.addEventListener('click',()=>stream?stop():start());
 function loop(){
  raf=requestAnimationFrame(loop);
- if(video.currentTime!==lastVideoTime){lastVideoTime=video.currentTime;const now=performance.now(),res=landmarker.detectForVideo(video,now),hands=handLandmarker.detectForVideo(video,now);face=res.faceLandmarks?.[0]||null;updateTongueGesture(face);updateHandGesture(hands.landmarks||[]);}
+ if(video.currentTime!==lastVideoTime){lastVideoTime=video.currentTime;const now=performance.now(),res=landmarker.detectForVideo(video,now),hands=handLandmarker.detectForVideo(video,now);face=res.faceLandmarks?.[0]||null;updateHandGesture(hands.landmarks||[]);}
  render();
 }
 function render(){
  const w=canvas.clientWidth,h=canvas.clientHeight;ctx.clearRect(0,0,w,h);
- if(imageTarget&&imagePixels[imageTarget]){renderImageParticles(w,h,imagePixels[imageTarget]);return}
- imageExplosionActive=false;
+ if(imageTarget&&imagePixels[imageTarget]){renderFilteredImage(w,h,imagePixels[imageTarget]);return}
  if(!face){drawIdle();return}
  const xs=face.map(p=>(1-p.x)*w),ys=face.map(p=>p.y*h);
  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
@@ -188,50 +200,31 @@ function render(){
   if(dist<115){const force=(1-dist/115)*5;dx+=mdx/(dist||1)*force*18;dy+=mdy/(dist||1)*force*18}
   if(exploding){dx+=(Math.sin(p.seed+performance.now()*.001)*.5)*fw*1.35;dy+=(Math.cos(p.seed+performance.now()*.0013)*.5)*fh*1.35;p.vx+=(Math.random()-.5)*2.2;p.vy+=(Math.random()-.5)*2.2}
   else{p.vx*=.78;p.vy*=.78}
-  if(mouthOpen){
-   const mouth=face[13]?{x:(1-face[13].x)*w,y:face[13].y*h}:null;
-   if(mouth){
-    const dxFromMouth=p.x-mouth.x,dyFromMouth=p.y-mouth.y,distance=Math.hypot(dxFromMouth,dyFromMouth)||1;
-    p.vx+=dxFromMouth/distance*.12*mouthStrength;
-    p.vy+=dyFromMouth/distance*.12*mouthStrength;
-   }
-  }
   p.x+=(dx*.075)+p.vx;p.y+=(dy*.075)+p.vy;
   if(!insideFace&&!exploding)continue;
   ctx.fillStyle=color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
  }
 }
-function renderImageParticles(w,h,image){
- const {width,height,data}=image;
- const bursting=mouthOpen;
- if(bursting&&!imageExplosionActive){
-  const centerX=w/2,centerY=h/2;
-  for(const p of particles){
-   let dx=p.x-centerX,dy=p.y-centerY,distance=Math.hypot(dx,dy)||1;
-   const impulse=5+Math.random()*5;
-   p.vx+=dx/distance*impulse;
-   p.vy+=dy/distance*impulse;
-  }
- }
- imageExplosionActive=bursting;
- const expansion=mouthOpen?SETTINGS.imageExplosionScale:SETTINGS.imageScaleClosed;
- imageExpansion+=(expansion-imageExpansion)*(mouthOpen ? .1 : .08);
- const scale=Math.min(w/width,h/height)*imageExpansion,drawWidth=width*scale,drawHeight=height*scale;
+function renderFilteredImage(w,h,image){
+ const scale=Math.max(w/image.width,h/image.height);
+ const drawWidth=image.width*scale,drawHeight=image.height*scale;
  const left=(w-drawWidth)/2,top=(h-drawHeight)/2;
+ ctx.save();
+ ctx.filter='contrast(1.08) saturate(.88)';
+ ctx.globalAlpha=.12;
+ ctx.drawImage(image.canvas,left,top,drawWidth,drawHeight);
+ ctx.restore();
+
  for(const p of particles){
-  const sx=Math.min(width-1,Math.floor(p.u*width)),sy=Math.min(height-1,Math.floor(p.v*height)),k=(sy*width+sx)*4;
-  if(data[k+3]<16)continue;
+  const sx=Math.min(image.width-1,Math.max(0,Math.floor(p.u*image.width)));
+  const sy=Math.min(image.height-1,Math.max(0,Math.floor(p.v*image.height)));
+  const k=(sy*image.width+sx)*4;
+  if(image.data[k+3]<16)continue;
   const tx=left+p.u*drawWidth,ty=top+p.v*drawHeight;
-  if(mouthOpen){
-   const dx=p.x-w/2,dy=p.y-h/2,distance=Math.hypot(dx,dy)||1;
-   p.vx+=dx/distance*.11*mouthStrength;p.vy+=dy/distance*.11*mouthStrength;
-   p.vx*=.985;p.vy*=.985;
-   p.x+=p.vx+(tx-p.x)*.012;p.y+=p.vy+(ty-p.y)*.012;
-  }else{
-   p.vx*=.82;p.vy*=.82;p.x+=(tx-p.x)*.14+p.vx;p.y+=(ty-p.y)*.14+p.vy;
-  }
-  ctx.fillStyle=`rgba(${data[k]},${data[k+1]},${data[k+2]},${data[k+3]/255})`;
-  ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
+  p.vx*=.82;p.vy*=.82;
+  p.x+=(tx-p.x)*.14+p.vx;p.y+=(ty-p.y)*.14+p.vy;
+  ctx.fillStyle=`rgba(${image.data[k]},${image.data[k+1]},${image.data[k+2]},${image.data[k+3]/255})`;
+  ctx.beginPath();ctx.arc(p.x,p.y,p.size*1.15,0,Math.PI*2);ctx.fill();
  }
 }
 function drawIdle(){const w=canvas.clientWidth,h=canvas.clientHeight;ctx.clearRect(0,0,w,h);for(const p of particles){ctx.fillStyle='rgba(130,160,195,.18)';ctx.fillRect(p.x,p.y,1.2,1.2)}}

@@ -12,6 +12,7 @@ interface Props {
   cam?: boolean;
   patternColors?: string[];
   patternVariant?: number;
+  animalColors?: string[];
 }
 
 const {
@@ -22,10 +23,14 @@ const {
   cam = false,
   patternColors,
   patternVariant = 0,
+  animalColors,
 } = Astro.props;
 
 const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
 const asset = (path: string) => `${base}${path.replace(/^\//, "")}`;
+const animalStyle = animalColors?.length >= 3
+  ? `--animal-color-a:${animalColors[0]};--animal-color-b:${animalColors[1]};--animal-color-c:${animalColors[2]};--page-background:linear-gradient(135deg,color-mix(in srgb,${animalColors[0]} 82%,${animalColors[1]} 18%),color-mix(in srgb,${animalColors[1]} 68%,${animalColors[2]} 32%),${animalColors[2]})`
+  : undefined;
 ---
 
 <!doctype html>
@@ -40,6 +45,7 @@ const asset = (path: string) => `${base}${path.replace(/^\//, "")}`;
   </head>
   <body
     class:list={[theme, { "home-page": home, "cam-page-body": cam }]}
+    style={animalStyle}
   >
     {!home && !cam && patternColors && (
       <OrganicPattern
@@ -53,9 +59,16 @@ const asset = (path: string) => `${base}${path.replace(/^\//, "")}`;
         <nav class="top-nav" aria-label="Navegación principal">
           {!home && <Logo href={base} />}
           {!home && (
-            <a class="cam-link" href={`${base}cam/`} aria-label="Abrir experiencia con cámara">
-              cam
-            </a>
+            <div class="nav-links" aria-label="Navegación de secciones">
+              <div class="section-links">
+                <a href={`${base}aire/`}>aire</a>
+                <a href={`${base}agua/`}>agua</a>
+                <a href={`${base}tierra/`}>tierra</a>
+              </div>
+              <a class="cam-link" href={`${base}cam/`} aria-label="Abrir experiencia con cámara">
+                cam
+              </a>
+            </div>
           )}
         </nav>
         <slot name="hero" />

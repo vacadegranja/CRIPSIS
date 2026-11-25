@@ -129,7 +129,7 @@ body.home-page.home-theme .home-sections {
   width: 100vw;
   min-height: 0;
   margin-top: 1vh;
-  margin-left: calc(-1 * var(--page-margin));
+  margin-left: 0;
   opacity: 0;
   pointer-events: auto;
   transition:
@@ -206,6 +206,16 @@ body.air-theme {
   --color-text: #ffffff;
 }
 
+body.air-theme[style*="--animal-color-a"],
+body.earth-theme[style*="--animal-color-a"],
+body.water-theme[style*="--animal-color-a"] {
+  background: var(--page-background);
+  --color-accent-air: var(--animal-color-a);
+  --color-accent-earth: var(--animal-color-b);
+  --color-accent-water: var(--animal-color-c);
+  --color-background: var(--animal-color-a);
+}
+
 body.earth-theme {
   --color-background: var(--color-accent-earth);
   --color-text: #ffffff;
@@ -270,9 +280,34 @@ footer {
   justify-content: space-between;
 }
 
-.cam-link {
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
   margin-left: auto;
-  font-size: 0.9rem;
+}
+
+.section-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 3vw, 2.5rem);
+}
+
+.section-links a {
+  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  text-transform: lowercase;
+}
+
+.section-links a:hover,
+.section-links a:focus-visible {
+  opacity: 0.6;
+}
+
+.cam-link {
+  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
   letter-spacing: 0.18em;
   text-decoration: none;
   text-transform: lowercase;
@@ -320,6 +355,70 @@ footer {
   font-family: var(--font-family);
   font-size: max(10vw, 2rem);
   letter-spacing: 0.05em;
+}
+
+.home-logo {
+  width: min(64vw, 46rem);
+  margin: 0 auto;
+  line-height: 0;
+  outline: none;
+}
+
+.home-logo svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  fill: #fff;
+}
+
+.home-logo-glyph {
+  display: inline;
+  cursor: default;
+  opacity: 1;
+  filter: blur(0);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity 350ms ease, filter 350ms ease, transform 350ms ease;
+  animation: home-glyph-intro 900ms ease backwards;
+  outline: none;
+}
+
+.home-logo-glyph:nth-child(2n) {
+  animation-delay: 70ms;
+}
+
+.home-logo-glyph:nth-child(3n) {
+  animation-delay: 140ms;
+}
+
+.home-logo-glyph:hover,
+.home-logo-glyph:focus-visible,
+.home-logo-glyph.is-hovered {
+  animation: none;
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(-0.04em);
+}
+
+@keyframes home-glyph-intro {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  65% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(10px);
+  }
+}
+
+.home-logo-glyph:not(:hover):not(:focus-visible):not(.is-hovered) {
+  animation-name: home-glyph-intro;
+  animation-duration: 900ms;
+  animation-fill-mode: forwards;
 }
 
 .hero-home .home-tagline {

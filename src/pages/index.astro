@@ -1,6 +1,5 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import LetterTitle from "../components/LetterTitle.astro";
 import { elements } from "../data/animals.js";
 
 const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
@@ -17,7 +16,31 @@ const entries = elementKeys.map((key) => ({
   home
 >
   <div class="hero hero-home" slot="hero">
-    <LetterTitle text="CRIPSIS" />
+    <h1 class="home-logo" aria-label="CRIPSIS" tabindex="0">
+      <svg viewBox="0 0 453.94 62.87" aria-hidden="true">
+        <g class="home-logo-glyph" tabindex="0" aria-label="C">
+          <path d="M23.95,62.87C8.51,62.87,0,54.37,0,38.92v-14.97C0,8.51,8.51,0,23.95,0h25.45c15.45,0,23.95,7.18,23.95,20.21,0,5.71-3.27,8.98-8.98,8.98h-16.47c-5.71,0-8.98-3.27-8.98-8.98v-8.23c0-1.12-.38-1.5-1.5-1.5h-1.5c-1.12,0-1.5.38-1.5,1.5v38.92c0,1.12.38,1.5,1.5,1.5h1.5c1.12,0,1.5-.38,1.5-1.5v-8.98c0-5.71,3.27-8.98,8.98-8.98h16.47c5.71,0,8.98,3.27,8.98,8.98v4.49c0,10.62-5.85,16.47-16.47,16.47H23.95Z"/>
+        </g>
+        <g class="home-logo-glyph" tabindex="0" aria-label="R">
+          <path d="M133.23,62.87c-10.62,0-16.47-5.85-16.47-16.47v-9.58h-4.49v17.07c0,5.71-3.27,8.98-8.98,8.98h-16.47c-5.71,0-8.98-3.27-8.98-8.98V8.98c0-5.71,3.27-8.98,8.98-8.98h46.41c11.7,0,16.47,5.29,16.47,18.26s-4.19,18.56-14.45,18.56h-8.01v.75c0,1.12.38,1.5,1.5,1.5h11.98c5.71,0,8.98,3.27,8.98,8.98v5.84c0,5.71-3.27,8.98-8.98,8.98h-7.49ZM113.77,10.48c-1.12,0-1.5.38-1.5,1.5v12.87c0,1.12.38,1.5,1.5,1.5h1.5c1.12,0,1.5-.38,1.5-1.5v-12.87c0-1.12-.38-1.5-1.5-1.5,0,0-1.5,0-1.5,0Z"/>
+        </g>
+        <g class="home-logo-glyph" tabindex="0" aria-label="I">
+          <rect x="154.18" width="34.43" height="62.87" rx="8.98" ry="8.98"/>
+        </g>
+        <g class="home-logo-glyph" tabindex="0" aria-label="P">
+          <path d="M242.88,0h-40.79c-5.72,0-8.99,3.27-8.99,8.98v44.91c0,5.71,3.27,8.98,8.98,8.98h16.47c5.71,0,8.98-3.27,8.98-8.98v-6.74h15.35c10.62,0,16.47-5.85,16.47-16.47v-14.22c-.01-10.61-5.86-16.46-16.47-16.46ZM230.52,26.72c0,.9-.68,1.57-1.57,1.57h-.6c-.9,0-1.57-.68-1.57-1.57v-14.67c0-.9.68-1.57,1.57-1.57h.6c.9,0,1.57.68,1.57,1.57v14.67Z"/>
+        </g>
+        <g class="home-logo-glyph" tabindex="0" aria-label="S">
+          <path d="M272.81,62.87c-5.71,0-8.98-3.27-8.98-8.98v-5.99c0-5.71,3.27-8.98,8.98-8.98h16.47c5.71,0,8.98,3.27,8.98,8.98v2.99c0,1.12.38,1.5,1.5,1.5h1.5c1.12,0,1.5-.38,1.5-1.5v-12.73c0-1.12-.38-1.5-1.5-1.5h-20.96c-10.62,0-16.47-5.85-16.47-16.47v-3.74C263.83,5.83,269.68-.02,280.3-.02h47.9c5.71,0,8.98,3.27,8.98,8.98v5.99c0,5.71-3.27,8.98-8.98,8.98h-16.47c-5.71,0-8.98-3.27-8.98-8.98v-2.99c0-1.12-.38-1.5-1.5-1.5h-1.5c-1.12,0-1.5.38-1.5,1.5v12.73c0,1.12.38,1.5,1.5,1.5h20.96c10.62,0,16.47,5.85,16.47,16.47v3.74c0,10.62-5.85,16.47-16.47,16.47,0,0-47.9,0-47.9,0Z"/>
+        </g>
+        <g class="home-logo-glyph" tabindex="0" aria-label="I">
+          <rect x="341.67" width="34.43" height="62.87" rx="8.98" ry="8.98"/>
+        </g>
+        <g class="home-logo-glyph" tabindex="0" aria-label="S">
+          <path d="M389.57,62.87c-5.71,0-8.98-3.27-8.98-8.98v-5.99c0-5.71,3.27-8.98,8.98-8.98h16.47c5.71,0,8.98,3.27,8.98,8.98v2.99c0,1.12.38,1.5,1.5,1.5h1.5c1.12,0,1.5-.38,1.5-1.5v-12.73c0-1.12-.38-1.5-1.5-1.5h-20.96c-10.62,0-16.47-5.85-16.47-16.47v-3.74C380.59,5.83,386.44-.02,397.06-.02h47.9c5.71,0,8.98,3.27,8.98,8.98v5.99c0,5.71-3.27,8.98-8.98,8.98h-16.47c-5.71,0-8.98-3.27-8.98-8.98v-2.99c0-1.12-.38-1.5-1.5-1.5h-1.5c-1.12,0-1.5.38-1.5,1.5v12.73c0,1.12.38,1.5,1.5,1.5h20.96c10.62,0,16.47,5.85,16.47,16.47v3.74c0,10.62-5.85,16.47-16.47,16.47,0,0-47.9,0-47.9,0Z"/>
+        </g>
+      </svg>
+    </h1>
     <p class="home-tagline">imperceptibilidad a los sentidos</p>
   </div>
 
@@ -47,23 +70,22 @@ const entries = elementKeys.map((key) => ({
     if (!homeSections || homeSections.dataset.interactionsReady === "true") return;
     homeSections.dataset.interactionsReady = "true";
 
-    const titleLetters = Array.from(
-      document.querySelectorAll<HTMLElement>(".hero-home .letter-title span"),
-    );
-    titleLetters.forEach((letter) => {
-      letter.addEventListener("pointerenter", () => {
-        letter.classList.add("is-hovered");
+    document
+      .querySelectorAll<SVGGElement>(".hero-home .home-logo-glyph")
+      .forEach((glyph) => {
+        glyph.addEventListener("pointerenter", () => {
+          glyph.classList.add("is-hovered");
+        });
+        glyph.addEventListener("pointerleave", () => {
+          glyph.classList.remove("is-hovered");
+        });
+        glyph.addEventListener("focus", () => {
+          glyph.classList.add("is-hovered");
+        });
+        glyph.addEventListener("blur", () => {
+          glyph.classList.remove("is-hovered");
+        });
       });
-      letter.addEventListener("pointerleave", () => {
-        letter.classList.remove("is-hovered");
-      });
-      letter.addEventListener("focus", () => {
-        letter.classList.add("is-hovered");
-      });
-      letter.addEventListener("blur", () => {
-        letter.classList.remove("is-hovered");
-      });
-    });
 
     homeSections.addEventListener("pointerenter", () => {
       document.body.classList.add("is-choice-active");

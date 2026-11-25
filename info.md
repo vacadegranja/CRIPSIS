@@ -96,7 +96,7 @@ Aturdir y despistar
 Aire	
 Aposematismo
 
-Pulpo mimo/ imitador	
+Pulpo mimo o imitador
 Thaumoctopus mimicus	
 Cambia su apariencia y comportamientos para imitar a otras especies y engañar a sus presas o depredadores.	
 Aguas saladas de océanos y mares de todo el mundo.	
