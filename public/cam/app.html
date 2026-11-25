@@ -29,8 +29,8 @@ button:disabled{opacity:.45;cursor:wait}
 .instructions-dialog ul{margin:0;padding-left:20px;color:#c4ccd8}
 .instructions-dialog li+li{margin-top:9px}
 .instructions-dialog .start-hint{margin:20px 0 0;color:#fff;text-align:center;font-weight:650}
-.help-button{position:fixed;z-index:15;left:18px;bottom:18px;width:44px;height:44px;padding:0;border-radius:50%;font-size:20px;font-weight:700}
-.camera-footer{position:fixed;z-index:15;right:18px;bottom:18px;margin:0}
+.help-button{position:fixed;z-index:15;left:18px;bottom:max(54px,calc(env(safe-area-inset-bottom) + 20px));width:44px;height:44px;padding:0;border-radius:50%;font-size:20px;font-weight:700}
+.camera-footer{position:fixed;z-index:15;right:18px;bottom:max(54px,calc(env(safe-area-inset-bottom) + 20px));margin:0}
 .camera-footer button{width:auto}
 @media(max-width:600px){main{padding:12px}header{align-items:flex-start}}
 </style>
@@ -76,7 +76,7 @@ document.addEventListener('click',event=>{
   closeInstructions();
  }
 });
-const SETTINGS={particleDensity:180,particleLimit:22000,particleMinSize:1,particleSizeRange:1.5,faceScaleX:1.35,faceScaleY:1.35,explosionScaleX:3.8,explosionScaleY:3.2};
+const SETTINGS={particleDensity:80,particleLimit:38000,particleMinSize:.75,particleSizeRange:1.35,faceScaleX:1.75,faceScaleY:1.75,explosionScaleX:3.8,explosionScaleY:3.2};
 let landmarker=null,handLandmarker=null,stream=null,particles=[],face=null,exploding=false,imageTarget=null,lastVideoTime=-1,raf=0,mouse={x:-9999,y:-9999},imagePixels={};
 const sample=document.createElement('canvas'),sctx=sample.getContext('2d',{willReadFrequently:true});
 const IMAGE_SOURCES={
@@ -130,10 +130,15 @@ function updateHandGesture(hands){
  imageTarget=null;
  if(hands.length>=2){
   const first=getHandPose(hands[0]),second=getHandPose(hands[1]);
+
   if(first!=='unknown'&&second!=='unknown'){
-   if(first==='open'&&second==='open')imageTarget='cebra';
-   else if(first==='closed'&&second==='closed')imageTarget='jaguar';
-   else imageTarget='pez';
+   if(first==='closed'&&second==='closed'){
+    imageTarget='jaguar';
+   }else if(first==='open'&&second==='open'){
+    imageTarget='cebra';
+   }else if(first!=='open'||second!=='open'){
+    imageTarget='pez';
+   }
   }
   exploding=false;
   return;
@@ -184,8 +189,8 @@ function render(){
  let data;try{data=sctx.getImageData(0,0,sample.width,sample.height).data}catch(e){return}
  for(const p of particles){
   const nx=(p.u-.5)*2,ny=(p.v-.5)*2;
-  const scaleX=exploding?SETTINGS.explosionScaleX:SETTINGS.faceScaleX;
-  const scaleY=exploding?SETTINGS.explosionScaleY:SETTINGS.faceScaleY;
+   const scaleX=exploding?SETTINGS.explosionScaleX:SETTINGS.faceScaleX;
+   const scaleY=exploding?SETTINGS.explosionScaleY:SETTINGS.faceScaleY;
   const tx=cx+nx*fw*scaleX*.5,ty=cy+ny*fh*scaleY*.5;
   const insideFace=pointInPolygon(tx,ty,outline);
   let color='rgba(170,205,239,.35)';
@@ -193,27 +198,33 @@ function render(){
    const sx=Math.max(0,Math.min(sample.width-1,Math.floor((tx/w)*sample.width)));
    const sy=Math.max(0,Math.min(sample.height-1,Math.floor((ty/h)*sample.height)));
    const k=(sy*sample.width+sx)*4;
-   color=`rgba(${data[k]},${data[k+1]},${data[k+2]},.92)`;
+    color=exploding
+     ?`rgba(${Math.round(data[k]*.28+130*.72)},${Math.round(data[k+1]*.28+160*.72)},${Math.round(data[k+2]*.28+195*.72)},.16)`
+     :`rgba(${data[k]},${data[k+1]},${data[k+2]},.82)`;
   }
   let dx=tx-p.x,dy=ty-p.y;
   const mdx=p.x-mouse.x,mdy=p.y-mouse.y,dist=Math.hypot(mdx,mdy);
   if(dist<115){const force=(1-dist/115)*5;dx+=mdx/(dist||1)*force*18;dy+=mdy/(dist||1)*force*18}
-  if(exploding){dx+=(Math.sin(p.seed+performance.now()*.001)*.5)*fw*1.35;dy+=(Math.cos(p.seed+performance.now()*.0013)*.5)*fh*1.35;p.vx+=(Math.random()-.5)*2.2;p.vy+=(Math.random()-.5)*2.2}
+  if(exploding){
+   const orbitX=Math.cos(p.seed+performance.now()*.0008)*(4+fw*.018);
+   const orbitY=Math.sin(p.seed+performance.now()*.00065)*(4+fh*.018);
+   dx+=orbitX;
+   dy+=orbitY;
+   p.vx*=.94;p.vy*=.94;
+  }
   else{p.vx*=.78;p.vy*=.78}
   p.x+=(dx*.075)+p.vx;p.y+=(dy*.075)+p.vy;
   if(!insideFace&&!exploding)continue;
-  ctx.fillStyle=color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,exploding?p.size*.72:p.size*1.12,0,Math.PI*2);
+  ctx.fill();
  }
 }
 function renderFilteredImage(w,h,image){
  const scale=Math.max(w/image.width,h/image.height);
  const drawWidth=image.width*scale,drawHeight=image.height*scale;
  const left=(w-drawWidth)/2,top=(h-drawHeight)/2;
- ctx.save();
- ctx.filter='contrast(1.08) saturate(.88)';
- ctx.globalAlpha=.12;
- ctx.drawImage(image.canvas,left,top,drawWidth,drawHeight);
- ctx.restore();
 
  for(const p of particles){
   const sx=Math.min(image.width-1,Math.max(0,Math.floor(p.u*image.width)));
