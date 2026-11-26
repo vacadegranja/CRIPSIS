@@ -1,7 +1,29 @@
 ---
-import { Content as InfoContent } from "../../info2.md";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { elements } from "../data/animals.js";
+
+const questions = [
+  {
+    question: "¿Qué es cripsis?",
+    answer:
+      "Es un fenómeno biológico por el cual un organismo presenta adaptaciones que le permiten pasar inadvertido frente a los sentidos de otros animales.",
+  },
+  {
+    question: "¿Qué es el mimetismo?",
+    answer:
+      "Habilidad de algunos seres vivos para parecerse a otro organismo o a su entorno para sobrevivir.",
+  },
+  {
+    question: "¿Qué es el camuflaje?",
+    answer:
+      "Es un mecanismo de defensa o adaptación que permite a un organismo u objeto mezclarse con su entorno para pasar desapercibido.",
+  },
+  {
+    question: "¿Qué es el aposematismo?",
+    answer:
+      "El aposematismo es un mecanismo de defensa en el que un organismo utiliza señales llamativas para advertir a los depredadores de su peligro.",
+  },
+];
 
 const patternPalettes = [
   elements.aire.patternColors,
@@ -19,8 +41,29 @@ const patternPalettes = [
 >
   <section class="info-page">
     <h1>info</h1>
-    <article class="info-content">
-      <InfoContent />
-    </article>
+    <div class="info-questions">
+      {questions.map(({ question, answer }, index) => (
+        <article class="info-question-card" style={`--card-index: ${index}`}>
+          <h2>{question}</h2>
+          <p>{answer}</p>
+        </article>
+      ))}
+      <article class="info-intro-card">
+        <ul>
+          <li>
+            En la naturaleza, animales y plantas se comunican mediante señales visuales, sonidos,
+            olores y texturas.
+          </li>
+          <li>
+            CRIPSIS explora el mimetismo, el camuflaje y el aposematismo como estrategias distintas
+            con las que cada especie transmite información.
+          </li>
+          <li>
+            Al comparar estas adaptaciones, te invitamos a observar cómo se entienden los
+            ecosistemas con formas de comunicación que van más allá de las palabras y de lo humano.
+          </li>
+        </ul>
+      </article>
+    </div>
   </section>
 </BaseLayout>

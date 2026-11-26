@@ -4,12 +4,17 @@ interface Props {
   name: string;
   image: string | null;
   alt: string;
+  backgroundColor?: string;
 }
 
-const { href, name, image, alt } = Astro.props;
+const { href, name, image, alt, backgroundColor } = Astro.props;
 ---
 
-<a class="animal-card" href={href}>
+<a
+  class="animal-card"
+  href={href}
+  style={backgroundColor ? `--animal-card-color: ${backgroundColor}` : undefined}
+>
   {image ? <img src={image} alt={alt} loading="lazy" /> : <div class="animal-image-missing" aria-label="Imagen no disponible">Imagen no disponible</div>}
   <h2>{name}</h2>
 </a>

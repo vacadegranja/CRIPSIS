@@ -5,7 +5,7 @@ export const elements = {
     name: "aire",
     theme: "air-theme",
     description: "Animales que habitan en el cielo.",
-    texture: "img/caligo_telamonius_memnon.jpg",
+    texture: "img/Caligo_telamonius_memnon.jpg",
     patternColors: ["#c4a060", "#e6c98a", "#fff0ce"],
     patternVariant: 1,
   },
@@ -13,7 +13,7 @@ export const elements = {
     name: "tierra",
     theme: "earth-theme",
     description: "Animales que habitan en la tierra.",
-    texture: "img/Chamaeleo_chamaeleon.jpg",
+    texture: "img/chamaeleo_chamaeleon.jpg",
     patternColors: ["#868c3f", "#b9c36b", "#e6e7a5"],
     patternVariant: 2,
   },
@@ -28,13 +28,13 @@ export const elements = {
 };
 
 const metadataRows = [
-  ["Chamaeleo chamaeleon", "camaleon", "Chamaeleo_chamaeleon.jpg", "Reptiles", "Chamaeleonidae"],
+  ["Chamaeleo chamaeleon", "camaleon", "chamaeleo_chamaeleon.jpg", "Reptiles", "Chamaeleonidae"],
   ["Huechys sanguinea", "cigarra-escarlata", "huechys_sanguinea.jpg", "Insectos", "Cicadidae"],
-  ["Cicada orni", "cigarra-comun", "Cicada_orni.jpg", "Insectos", "Cicadidae"],
+  ["Cicada orni", "cigarra-comun", "cicada_orni.jpg", "Insectos", "Cicadidae"],
   ["Erinaceus europaeus", "erizo-europeo", "erinaceus_europaeus.jpg", "Mamíferos", "Erinaceidae"],
   ["Medauroidea extradentata", "insecto-palo-vietnam", "medauroidea_extradentata.jpg", "Insectos", "Phasmatidae"],
   ["Hymenopus coronatus", "mantis-orquidea", "hymenopus_coronatus.jpg", "Insectos", "Hymenopodidae"],
-  ["Caligo telamonius memnon", "mariposa-caligo", "caligo_telamonius_memnon.jpg", "Insectos", "Nymphalidae"],
+  ["Caligo telamonius memnon", "mariposa-caligo", "Caligo_telamonius_memnon.jpg", "Insectos", "Nymphalidae"],
   ["Gastropacha quercifolia", "mariposa-hoja-seca", "gastropacha_quercifolia.jpg", "Insectos", "Lasiocampidae"],
   ["Arctia caja", "polilla-tigre", "arctia_caja.jpg", "Insectos", "Erebidae"],
   ["Thaumoctopus mimicus", "pulpo", "thaumoctopus_mimicus.jpg", "Moluscos", "Octopodidae"],
@@ -48,31 +48,31 @@ const metadataRows = [
   ["Otospermophilus beecheyi", "ardilla-terrestre-california", "otospermophilus_beecheyi.jpg", "Mamíferos", "Sciuridae"],
   ["Phycodurus eques", "dragon-de-mar", "phycodurus_eques.jpg", "Peces", "Syngnathidae"],
   ["Bubo virginianus", "buho-cornudo", "bubo_virginianus.jpg", "Aves", "Strigidae"],
-  ["Euglossa sp.", "abeja-orquideas", null, "Insectos", "Apidae"],
+  ["Euglossa sp.", "abeja-orquideas", "euglossa_sp_.jpg", "Insectos", "Apidae"],
   ["Hippocampus bargibanti", "caballito-mar-pigmeo", "hippocampus_bargibanti.jpg", "Peces", "Syngnathidae"],
   ["Synanceia verrucosa", "pez-piedra", "synanceia_verrucosa.jpg", "Peces", "Scorpaenidae"],
   ["Camposcia retusa", "cangrejo-decorador", "camposcia_retusa.jpg", "Crustáceos", "Epialtidae"],
   ["Nictibio urutaú", "potoo", "nictibio_urutau.jpg", "Aves", "Nyctibiidae"],
-  ["Cuculus canorus", "cuco-comun", "Cuculus_canorus.jpg", "Aves", "Cuculidae"],
+  ["Cuculus canorus", "cuco-comun", "cuculus_canorus.jpg", "Aves", "Cuculidae"],
   ["Danaus plexippus", "mariposa-monarca", "danaus_plexippus.jpg", "Insectos", "Nymphalidae"],
   ["Dendrobates tinctorius", "rana-dardo-venenosa", "dendrobates_tinctorius.jpg", "Anfibios", "Dendrobatidae"],
   ["Vespula vulgaris", "avispa-comun", "vespula_vulgaris.jpg", "Insectos", "Vespidae"],
   ["Hapalochlaena maculosa", "pulpo-anillos-azules", "hapalochlaena_maculosa.jpg", "Moluscos", "Octopodidae"],
   ["Antrozous pallidus", "murcielago-palido", "antrozous_pallidus.jpg", "Mamíferos", "Vespertilionidae"],
-  ["Hemaris diffinis", "esfinge-colibri", "hermaris_diffinis.jpg", "Insectos", "Sphingidae"],
+  ["Hemaris diffinis", "esfinge-colibri", "hemaris_diffinis.jpg", "Insectos", "Sphingidae"],
   ["Pterois volitans", "pez-leon", "pterois_volitans.jpg", "Peces", "Scorpaenidae"],
   ["Acanthurus pyroferus", "pez-cirujano-imitador", "acanthurus_pyroferus.jpg", "Peces", "Acanthuridae"],
   ["Bothus mancus", "lenguado-pavo-real", "bothus_mancus.jpg", "Peces", "Bothidae"],
   ["Histrio histrio", "pez-sargazo", "histrio_histrio.jpg", "Peces", "Antennariidae"],
-  ["Panthera onca", "jaguar", null, "Mamíferos", "Felidae"],
-  ["Equus quagga", "cebra-comun", null, "Mamíferos", "Equidae"],
-  ["Dicrurus paradiseus", "drongo-cola-larga", null, "Aves", "Dicruridae"],
-  ["Bombus vestalis", "abejorro-cuco", null, "Insectos", "Apidae"],
-  ["Oxymonacanthus longirostris", "pez-lima-arlequin", null, "Peces", "Monacanthidae"],
-  ["Corvus corax", "cuervo-comun", null, "Aves", "Corvidae"],
-  ["Glaucus atlanticus", "dragon-azul", null, "Moluscos", "Glaucidae"],
-  ["Metasepia pfefferi", "sepia-extravagante", null, "Moluscos", "Sepiidae"],
-  ["Caprimulgus europaeus", "chotacabras-europeo", null, "Aves", "Caprimulgidae"],
+  ["Panthera onca", "jaguar", "panthera_onca.jpg", "Mamíferos", "Felidae"],
+  ["Equus quagga", "cebra-comun", "equus_quagga.jpg", "Mamíferos", "Equidae"],
+  ["Dicrurus paradiseus", "drongo-cola-larga", "dicrurus_paradiseus.jpg", "Aves", "Dicruridae"],
+  ["Bombus vestalis", "abejorro-cuco", "bombus_vestalis.jpg", "Insectos", "Apidae"],
+  ["Oxymonacanthus longirostris", "pez-lima-arlequin", "oxymonacanthus_longirostris.jpg", "Peces", "Monacanthidae"],
+  ["Corvus corax", "cuervo-comun", "corvus_corax.jpg", "Aves", "Corvidae"],
+  ["Glaucus atlanticus", "dragon-azul", "glaucus_atlanticus.jpg", "Moluscos", "Glaucidae"],
+  ["Metasepia pfefferi", "sepia-extravagante", "metasepia_pfefferi.jpg", "Moluscos", "Sepiidae"],
+  ["Caprimulgus europaeus", "chotacabras-europeo", "caprimulgus_europaeus.jpg", "Aves", "Caprimulgidae"],
 ];
 
 const metadataByScientificName = new Map(
@@ -138,6 +138,25 @@ function parseCatalog(source) {
     .filter(Boolean);
 }
 
+/**
+ * @typedef {object} Animal
+ * @property {string} slug
+ * @property {"aire" | "tierra" | "agua"} element
+ * @property {string} name
+ * @property {string} scientificName
+ * @property {string | null} cover
+ * @property {string} texture
+ * @property {string} alt
+ * @property {string} description
+ * @property {string} habitat
+ * @property {string} sense
+ * @property {string} use
+ * @property {string} action
+ * @property {string} adaptation
+ * @property {string} group
+ * @property {string} family
+ */
+/** @type {Animal[]} */
 export const animals = parseCatalog(catalogSource);
 
 export function animalsByElement(element) {

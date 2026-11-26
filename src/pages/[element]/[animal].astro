@@ -25,6 +25,12 @@ const splitAdaptations = (value: string) =>
     .filter(Boolean)
     .join(" ");
 const relatedAnimals = animals.filter((item) => item.slug !== animal.slug);
+const relatedCards = await Promise.all(
+  relatedAnimals.map(async (item) => ({
+    item,
+    backgroundColor: (await extractAnimalColors(item.cover))?.[0],
+  })),
+);
 ---
 
 <BaseLayout
@@ -96,10 +102,11 @@ const relatedAnimals = animals.filter((item) => item.slug !== animal.slug);
       </div>
       <p class="related-status" data-related-status aria-live="polite"></p>
       <div class="animal-grid related-grid" data-related-grid>
-        {relatedAnimals.map((item) => (
+        {relatedCards.map(({ item, backgroundColor }) => (
           <a
             class="animal-card"
             href={`${base}${item.element}/${item.slug}/`}
+            style={backgroundColor ? `--animal-card-color: ${backgroundColor}` : undefined}
             data-related-card
             data-element={item.element}
             data-adaptations={splitAdaptations(item.adaptation)}

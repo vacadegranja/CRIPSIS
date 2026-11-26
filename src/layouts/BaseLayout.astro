@@ -30,7 +30,7 @@ const {
 
 const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
 const asset = (path: string) => `${base}${path.replace(/^\//, "")}`;
-const animalStyle = animalColors?.length >= 3
+const animalStyle = animalColors && animalColors.length >= 3
   ? `--animal-color-a:${animalColors[0]};--animal-color-b:${animalColors[1]};--animal-color-c:${animalColors[2]};--page-background:linear-gradient(135deg,color-mix(in srgb,${animalColors[0]} 82%,${animalColors[1]} 18%),color-mix(in srgb,${animalColors[1]} 68%,${animalColors[2]} 32%),${animalColors[2]})`
   : undefined;
 ---

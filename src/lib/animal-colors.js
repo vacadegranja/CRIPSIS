@@ -4,6 +4,16 @@ import { getPalette } from "colorthief";
 
 const paletteCache = new Map();
 
+function muteColor(hex, amount = 0.14) {
+  const channels = hex.match(/[a-f\d]{2}/gi)?.map((channel) => Number.parseInt(channel, 16));
+  if (!channels || channels.length !== 3) return hex;
+
+  const muted = channels.map((channel, index) =>
+    Math.round(channel * (1 - amount) + [39, 71, 75][index] * amount),
+  );
+  return `#${muted.map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
+}
+
 export async function extractAnimalColors(cover) {
   if (!cover) return null;
   if (paletteCache.has(cover)) return paletteCache.get(cover);
@@ -11,13 +21,18 @@ export async function extractAnimalColors(cover) {
   try {
     const imagePath = path.resolve(process.cwd(), cover);
     const image = await readFile(imagePath);
-    const isCaligo = path.basename(cover) === "caligo_telamonius_memnon.jpg";
+    const imageName = path.basename(cover).toLowerCase();
+    const isCaligo = imageName === "caligo_telamonius_memnon.jpg";
+    const isSeaDragon = imageName === "phycodurus_eques.jpg";
     const isWasp = path.basename(cover) === "vespula_vulgaris.jpg";
+    const seaDragonBlueRegion = { x: 0.5, y: 0.5, width: 0.45, height: 0.45 };
     const palette = await getPalette(image, {
       colorCount: 20,
       quality: 10,
       region: isCaligo
         ? { x: 0.34, y: 0.18, width: 0.38, height: 0.66 }
+        : isSeaDragon
+          ? seaDragonBlueRegion
         : { x: 0.15, y: 0.1, width: 0.7, height: 0.8 },
     });
 
@@ -37,14 +52,19 @@ export async function extractAnimalColors(cover) {
         vibrancy: saturation * (0.6 + 0.4 * lightnessBalance),
       };
     });
-    const preferredCandidates = isCaligo
+    const preferredCandidates = isCaligo || isSeaDragon
       ? candidates.filter(
-          ({ color, hue, lightness }) =>
+          ({ color, hue, lightness }) => {
+            const hueMatches = isSeaDragon
+              ? hue >= 175 && hue <= 215
+              : hue >= 15 && hue <= 55;
+            return (
             color.population >= maxPopulation * 0.02 &&
-            hue >= 15 &&
-            hue <= 55 &&
+            hueMatches &&
             lightness >= 18 &&
-            lightness <= 85,
+            lightness <= 85
+            );
+          },
         )
       : candidates.filter(
           ({ color, lightness }) =>
@@ -52,13 +72,22 @@ export async function extractAnimalColors(cover) {
             lightness >= 20 &&
             lightness <= 88,
         );
-    const colors = (preferredCandidates.length >= 3 ? preferredCandidates : candidates)
+    const minimumPreferredColors = isSeaDragon ? 2 : 3;
+    const colors = (
+      preferredCandidates.length >= minimumPreferredColors
+        ? preferredCandidates
+        : candidates
+    )
       .sort((a, b) => {
         const score = (candidate) =>
           isCaligo
             ? candidate.saturation *
               Math.sqrt(candidate.color.population / maxPopulation) *
               (0.5 + 0.5 * candidate.lightnessBalance)
+            : isSeaDragon
+              ? candidate.saturation *
+                Math.sqrt(candidate.color.population / maxPopulation) *
+                candidate.lightnessBalance
             : candidate.vibrancy;
         return score(b) - score(a) || a.index - b.index;
       })
@@ -86,7 +115,9 @@ export async function extractAnimalColors(cover) {
       }
     }
 
-    const extractedColors = colors.map(({ color }) => color.hex());
+    const extractedColors = colors.map(({ color }) =>
+      isSeaDragon ? muteColor(color.hex()) : color.hex(),
+    );
 
     paletteCache.set(cover, extractedColors);
     return extractedColors;
