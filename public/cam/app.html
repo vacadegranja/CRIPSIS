@@ -38,17 +38,28 @@ button:disabled{opacity:.45;cursor:wait}
 <body>
 <main>
 <header><div class="status"><span id="dot" class="dot"></span><small id="state">Cámara apagada</small></div></header>
-<section class="stage"><canvas id="view"></canvas><video id="video" playsinline muted></video><div id="message"><strong>Tu rostro e imágenes</strong>Activa la cámara para comenzar. Permite el acceso cuando el navegador lo solicite.</div></section>
+<section class="stage"><canvas id="view"></canvas><video id="video" playsinline muted></video><div id="message">Activa la cámara para empezar.</div></section>
 </main>
 <footer class="camera-footer"><button id="camera" class="primary">Activar cámara</button></footer>
 <div class="instructions-overlay" id="instructions" role="dialog" aria-modal="true" aria-labelledby="instructions-title">
  <div class="instructions-dialog">
   <h2 id="instructions-title">Instrucciones</h2>
   <ul>
-   <li>Dos manos abiertas: muestra la imagen de la cebra.</li>
-   <li>Dos puños: muestra la imagen del jaguar.</li>
-   <li>Una mano abierta y un puño: muestra la imagen del pez.</li>
-   <li>Una mano abierta dispersa el rostro; cierra el puño para reconstruirlo.</li>
+   <li>Los gestos de dos manos requieren que la cámara detecte ambas manos.</li>
+   <li>Si aparecen más de dos manos en cámara, la detección de los gestos puede fallar.</li>
+   <li><strong>Solo una mano:</strong>
+    <ul>
+     <li>Abierta: explota el rostro.</li>
+     <li>Cerrada: reconstruye el rostro.</li>
+    </ul>
+   </li>
+   <li><strong>Ambas manos:</strong>
+    <ul>
+     <li>Dos manos abiertas: cebra.</li>
+     <li>Dos puños cerrados: jaguar.</li>
+     <li>Una mano abierta y un puño cerrado: pez.</li>
+    </ul>
+   </li>
   </ul>
   <p class="start-hint">Haz clic en cualquier lado para empezar</p>
  </div>
@@ -165,7 +176,7 @@ async function start(){
   video.srcObject=stream;await video.play();message.style.display='none';cameraBtn.textContent='Apagar cámara';cameraBtn.disabled=false;setStatus(true,'Cámara activa');loop();
  }catch(e){console.error(e);state.textContent='No se pudo iniciar';cameraBtn.disabled=false;cameraBtn.textContent='Reintentar';message.style.display='block';message.innerHTML='<strong>No se pudo iniciar</strong>Comprueba los permisos de cámara, la conexión y que las imágenes de img estén disponibles.'}
 }
-function stop(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;cancelAnimationFrame(raf);face=null;exploding=false;imageTarget=null;lastVideoTime=-1;cameraBtn.textContent='Activar cámara';setStatus(false,'Cámara apagada');message.style.display='block';message.innerHTML='<strong>Tu rostro e imágenes</strong>Activa la cámara para comenzar.';drawIdle()}
+function stop(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;cancelAnimationFrame(raf);face=null;exploding=false;imageTarget=null;lastVideoTime=-1;cameraBtn.textContent='Activar cámara';setStatus(false,'Cámara apagada');message.style.display='block';message.textContent='Activa la cámara para empezar.';drawIdle()}
 cameraBtn.addEventListener('click',()=>stream?stop():start());
 function loop(){
  raf=requestAnimationFrame(loop);
@@ -176,12 +187,18 @@ function render(){
  const w=canvas.clientWidth,h=canvas.clientHeight;ctx.clearRect(0,0,w,h);
  if(imageTarget&&imagePixels[imageTarget]){renderFilteredImage(w,h,imagePixels[imageTarget]);return}
  if(!face){drawIdle();return}
- const xs=face.map(p=>(1-p.x)*w),ys=face.map(p=>p.y*h);
+ const videoScale=Math.max(w/video.videoWidth,h/video.videoHeight);
+ const videoLeft=(w-video.videoWidth*videoScale)/2,videoTop=(h-video.videoHeight*videoScale)/2;
+ const xs=face.map(p=>videoLeft+(1-p.x)*video.videoWidth*videoScale);
+ const ys=face.map(p=>videoTop+p.y*video.videoHeight*videoScale);
  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
  const fw=maxX-minX,fh=maxY-minY;
  const cx=(minX+maxX)/2,cy=(minY+maxY)/2;
  const outlineIndices=[10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67,109];
- const faceOutline=outlineIndices.map(i=>({x:(1-face[i].x)*w,y:face[i].y*h}));
+ const faceOutline=outlineIndices.map(i=>({
+  x:videoLeft+(1-face[i].x)*video.videoWidth*videoScale,
+  y:videoTop+face[i].y*video.videoHeight*videoScale
+ }));
  const currentFaceScaleX=exploding?SETTINGS.explosionScaleX:SETTINGS.faceScaleX;
  const currentFaceScaleY=exploding?SETTINGS.explosionScaleY:SETTINGS.faceScaleY;
  const outline=faceOutline.map(point=>({x:cx+(point.x-cx)*currentFaceScaleX,y:cy+(point.y-cy)*currentFaceScaleY}));
@@ -193,14 +210,12 @@ function render(){
    const scaleY=exploding?SETTINGS.explosionScaleY:SETTINGS.faceScaleY;
   const tx=cx+nx*fw*scaleX*.5,ty=cy+ny*fh*scaleY*.5;
   const insideFace=pointInPolygon(tx,ty,outline);
-  let color='rgba(170,205,239,.35)';
-  if(insideFace){
-   const sx=Math.max(0,Math.min(sample.width-1,Math.floor((tx/w)*sample.width)));
-   const sy=Math.max(0,Math.min(sample.height-1,Math.floor((ty/h)*sample.height)));
+  let color=exploding?'rgba(220,225,232,.72)':'rgba(170,205,239,.35)';
+  if(insideFace&&!exploding){
+   const sx=Math.max(0,Math.min(sample.width-1,Math.floor((tx-videoLeft)/videoScale)));
+   const sy=Math.max(0,Math.min(sample.height-1,Math.floor((ty-videoTop)/videoScale)));
    const k=(sy*sample.width+sx)*4;
-    color=exploding
-     ?`rgba(${Math.round(data[k]*.28+130*.72)},${Math.round(data[k+1]*.28+160*.72)},${Math.round(data[k+2]*.28+195*.72)},.16)`
-     :`rgba(${data[k]},${data[k+1]},${data[k+2]},.82)`;
+   color=`rgba(${data[k]},${data[k+1]},${data[k+2]},.82)`;
   }
   let dx=tx-p.x,dy=ty-p.y;
   const mdx=p.x-mouse.x,mdy=p.y-mouse.y,dist=Math.hypot(mdx,mdy);

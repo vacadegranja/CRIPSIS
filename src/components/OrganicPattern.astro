@@ -1,6 +1,7 @@
 ---
 interface Props {
   colors: string[];
+  palettes?: string[][];
   intensity?: number;
   variant?: number;
   class?: string;
@@ -8,6 +9,7 @@ interface Props {
 
 const {
   colors,
+  palettes,
   intensity = 0.82,
   variant = 0,
   class: className = "",
@@ -18,6 +20,7 @@ const {
   class:list={["organic-pattern", className]}
   data-organic-pattern
   data-colors={colors.join(",")}
+  data-palette-sequence={palettes ? JSON.stringify(palettes) : undefined}
   data-intensity={intensity}
   data-variant={variant}
   aria-hidden="true"
@@ -134,15 +137,25 @@ const {
         variantBands = 1.0 - smoothstep(0.04, 0.15, abs(waves - 0.08));
         halo += variantBands * 0.20;
       } else if (uVariant < 1.5) {
-        vec2 feathers = abs(fract(fieldUv * 0.72) - 0.5);
-        float eye = 1.0 - smoothstep(0.12, 0.24, length(feathers));
-        variantBands = eye * (0.55 + 0.45 * sin(fieldUv.x * 5.0));
-        lines = max(lines, variantBands);
+        vec2 featherCell = fract(fieldUv * vec2(0.62, 1.0)) - 0.5;
+        float featherEye = length(featherCell * vec2(0.72, 1.5));
+        float featherRings = abs(fract(featherEye * 3.2) - 0.5);
+        float eyeLines = 1.0 - smoothstep(0.07, 0.19, featherRings);
+        float featherVein = 1.0 - smoothstep(
+          0.025,
+          0.075,
+          abs(featherCell.x + featherCell.y * 0.22)
+        );
+        lines = max(eyeLines * 0.82, featherVein * 0.48);
+        halo = eyeLines * 0.24;
       } else if (uVariant < 2.5) {
-        vec2 scales = fract(fieldUv * 1.18) - 0.5;
-        float scaleArc = abs(length(scales) - 0.34);
-        variantBands = 1.0 - smoothstep(0.025, 0.09, scaleArc);
-        lines = max(lines, variantBands);
+        float terrain = fbm(p * 2.8 + flow * 0.55);
+        float contour = abs(fract(terrain * 13.0) - 0.5);
+        float indexContour = abs(fract(terrain * 3.25) - 0.5);
+        float contourLines = 1.0 - smoothstep(0.025, 0.075, contour);
+        float majorLines = 1.0 - smoothstep(0.035, 0.095, indexContour);
+        lines = max(contourLines * 0.72, majorLines);
+        halo = contourLines * 0.12 + majorLines * 0.24;
       } else {
         variantBands = 1.0 - smoothstep(0.02, 0.11, abs(sin((fieldUv.x + fieldUv.y) * 2.2)));
         lines = max(lines, variantBands * 0.68);
@@ -188,6 +201,9 @@ const {
       initialized.add(canvas);
 
       const colors = (root.dataset.colors || "#c4a060,#e6c98a,#fff0ce").split(",");
+      const paletteSequence: string[][] | undefined = root.dataset.paletteSequence
+        ? JSON.parse(root.dataset.paletteSequence)
+        : undefined;
       const intensity = Number(root.dataset.intensity || 0.82);
       const variant = Number(root.dataset.variant || 0);
       const renderer = new THREE.WebGLRenderer({
@@ -213,6 +229,11 @@ const {
         uColorB: { value: colorUniform(colors[1] || "", "#e6c98a") },
         uColorC: { value: colorUniform(colors[2] || "", "#fff0ce") },
       };
+      const paletteColors = paletteSequence?.map((palette) => [
+        colorUniform(palette[0] || "", "#c4a060"),
+        colorUniform(palette[1] || "", "#e6c98a"),
+        colorUniform(palette[2] || "", "#fff0ce"),
+      ]);
       const material = new THREE.ShaderMaterial({
         vertexShader,
         fragmentShader,
@@ -259,6 +280,32 @@ const {
       const animate = (now: number) => {
         animationFrame = requestAnimationFrame(animate);
         const elapsed = (now - startTime) / 1000;
+        if (paletteColors && paletteColors.length > 1 && !reducedMotion) {
+          const transitionDuration = 2.4;
+          const palettePosition = elapsed / transitionDuration;
+          const paletteIndex = Math.floor(palettePosition) % paletteColors.length;
+          const nextPaletteIndex = (paletteIndex + 1) % paletteColors.length;
+          const transition = THREE.MathUtils.smoothstep(
+            palettePosition % 1,
+            0,
+            1,
+          );
+          uniforms.uColorA.value.lerpColors(
+            paletteColors[paletteIndex][0],
+            paletteColors[nextPaletteIndex][0],
+            transition,
+          );
+          uniforms.uColorB.value.lerpColors(
+            paletteColors[paletteIndex][1],
+            paletteColors[nextPaletteIndex][1],
+            transition,
+          );
+          uniforms.uColorC.value.lerpColors(
+            paletteColors[paletteIndex][2],
+            paletteColors[nextPaletteIndex][2],
+            transition,
+          );
+        }
         const documentHeight = Math.max(
           document.documentElement.scrollHeight,
           document.body.scrollHeight,

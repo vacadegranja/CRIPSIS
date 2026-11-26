@@ -11,6 +11,7 @@ interface Props {
   home?: boolean;
   cam?: boolean;
   patternColors?: string[];
+  patternPalettes?: string[][];
   patternVariant?: number;
   animalColors?: string[];
 }
@@ -22,6 +23,7 @@ const {
   home = false,
   cam = false,
   patternColors,
+  patternPalettes,
   patternVariant = 0,
   animalColors,
 } = Astro.props;
@@ -50,6 +52,7 @@ const animalStyle = animalColors?.length >= 3
     {!home && !cam && patternColors && (
       <OrganicPattern
         colors={patternColors}
+        palettes={patternPalettes}
         variant={patternVariant}
         class="site-pattern"
       />
@@ -58,18 +61,60 @@ const animalStyle = animalColors?.length >= 3
       <header class="site-header">
         <nav class="top-nav" aria-label="Navegación principal">
           {!home && <Logo href={base} />}
-          {!home && (
-            <div class="nav-links" aria-label="Navegación de secciones">
-              <div class="section-links">
-                <a href={`${base}aire/`}>aire</a>
-                <a href={`${base}agua/`}>agua</a>
-                <a href={`${base}tierra/`}>tierra</a>
-              </div>
-              <a class="cam-link" href={`${base}cam/`} aria-label="Abrir experiencia con cámara">
-                cam
-              </a>
-            </div>
-          )}
+          <button
+            class="nav-menu-toggle"
+            type="button"
+            aria-label="Abrir menú"
+            aria-expanded="false"
+            aria-controls="site-nav-links"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div
+            id="site-nav-links"
+            class:list={["nav-links", { "home-nav-links": home }]}
+            aria-label="Navegación de secciones"
+          >
+            {home ? (
+              <>
+                <a class="info-link" href={`${base}info/`}>info</a>
+                <a class="cam-link" href={`${base}cam/`} aria-label="Abrir experiencia con cámara">
+                  cam
+                </a>
+              </>
+            ) : (
+              <>
+                <div class="section-links">
+                  <div class="elements-dropdown">
+                    <button
+                      class="elements-dropdown__toggle"
+                      type="button"
+                      aria-expanded="false"
+                      aria-controls="elements-dropdown-menu"
+                    >
+                      elementos
+                    </button>
+                    <div
+                      class="elements-dropdown__menu"
+                      id="elements-dropdown-menu"
+                      aria-hidden="true"
+                      inert
+                    >
+                      <a href={`${base}aire/`}>aire</a>
+                      <a href={`${base}agua/`}>agua</a>
+                      <a href={`${base}tierra/`}>tierra</a>
+                    </div>
+                  </div>
+                  <a class="info-link" href={`${base}info/`}>info</a>
+                </div>
+                <a class="cam-link" href={`${base}cam/`} aria-label="Abrir experiencia con cámara">
+                  cam
+                </a>
+              </>
+            )}
+          </div>
         </nav>
         <slot name="hero" />
       </header>
@@ -82,3 +127,73 @@ const animalStyle = animalColors?.length >= 3
     </div>
   </body>
 </html>
+
+<script>
+  function initializeNavigation() {
+    document.querySelectorAll<HTMLButtonElement>(".nav-menu-toggle").forEach((button) => {
+      if (button.dataset.menuReady === "true") return;
+      button.dataset.menuReady = "true";
+
+      const menu = document.getElementById(button.getAttribute("aria-controls") || "");
+      if (!menu) return;
+      const elementsToggle = menu.querySelector<HTMLButtonElement>(".elements-dropdown__toggle");
+      const elementsMenu = menu.querySelector<HTMLElement>(".elements-dropdown__menu");
+
+      const closeMenu = () => {
+        menu.classList.remove("is-open");
+        button.setAttribute("aria-expanded", "false");
+        button.setAttribute("aria-label", "Abrir menú");
+        elementsMenu?.removeAttribute("data-open");
+        elementsMenu?.setAttribute("aria-hidden", "true");
+        elementsMenu?.setAttribute("inert", "");
+        elementsToggle?.setAttribute("aria-expanded", "false");
+      };
+
+      elementsToggle?.addEventListener("click", () => {
+        const isOpen = elementsToggle.getAttribute("aria-expanded") === "true";
+        elementsToggle.setAttribute("aria-expanded", String(!isOpen));
+        if (isOpen) {
+          elementsMenu?.removeAttribute("data-open");
+          elementsMenu?.setAttribute("aria-hidden", "true");
+          elementsMenu?.setAttribute("inert", "");
+        } else {
+          elementsMenu?.setAttribute("data-open", "true");
+          elementsMenu?.setAttribute("aria-hidden", "false");
+          elementsMenu?.removeAttribute("inert");
+        }
+      });
+
+      button.addEventListener("click", () => {
+        const isOpen = button.getAttribute("aria-expanded") === "true";
+        if (isOpen) {
+          closeMenu();
+        } else {
+          menu.classList.add("is-open");
+          button.setAttribute("aria-expanded", "true");
+          button.setAttribute("aria-label", "Cerrar menú");
+        }
+      });
+
+      menu.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", closeMenu);
+      });
+
+      button.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeMenu();
+      });
+
+      elementsToggle?.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          elementsToggle.setAttribute("aria-expanded", "false");
+          elementsMenu?.removeAttribute("data-open");
+          elementsMenu?.setAttribute("aria-hidden", "true");
+          elementsMenu?.setAttribute("inert", "");
+          elementsToggle.focus();
+        }
+      });
+    });
+  }
+
+  initializeNavigation();
+  document.addEventListener("astro:page-load", initializeNavigation);
+</script>

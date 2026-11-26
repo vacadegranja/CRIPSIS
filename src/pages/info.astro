@@ -1,0 +1,26 @@
+---
+import { Content as InfoContent } from "../../info2.md";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { elements } from "../data/animals.js";
+
+const patternPalettes = [
+  elements.aire.patternColors,
+  elements.agua.patternColors,
+  elements.tierra.patternColors,
+];
+---
+
+<BaseLayout
+  title="Info — CRIPSIS"
+  description="Información sobre CRIPSIS, cripsis, mimetismo, camuflaje y aposematismo."
+  theme="info-theme"
+  patternColors={patternPalettes[0]}
+  patternPalettes={patternPalettes}
+>
+  <section class="info-page">
+    <h1>info</h1>
+    <article class="info-content">
+      <InfoContent />
+    </article>
+  </section>
+</BaseLayout>
