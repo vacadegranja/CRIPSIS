@@ -50,10 +50,9 @@ const entries = elementKeys.map((key) => ({
         <a
           class={`home-line home-line-${element.key}`}
           href={`${base}${element.key}/`}
-          aria-label={`${element.name}: ${element.description}`}
+          aria-label={element.name}
         >
           <h3>{element.name}</h3>
-          <p>{element.description}</p>
         </a>
       ))
     }

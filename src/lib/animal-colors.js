@@ -12,6 +12,7 @@ export async function extractAnimalColors(cover) {
     const imagePath = path.resolve(process.cwd(), cover);
     const image = await readFile(imagePath);
     const isCaligo = path.basename(cover) === "caligo_telamonius_memnon.jpg";
+    const isWasp = path.basename(cover) === "vespula_vulgaris.jpg";
     const palette = await getPalette(image, {
       colorCount: 20,
       quality: 10,
@@ -61,11 +62,34 @@ export async function extractAnimalColors(cover) {
             : candidate.vibrancy;
         return score(b) - score(a) || a.index - b.index;
       })
-      .slice(0, 3)
-      .map(({ color }) => color.hex());
+      .slice(0, 3);
 
-    paletteCache.set(cover, colors);
-    return colors;
+    if (isWasp) {
+      const yellow = candidates
+        .filter(
+          ({ color, hue, saturation, lightness }) =>
+            color.population >= maxPopulation * 0.02 &&
+            hue >= 45 &&
+            hue <= 70 &&
+            saturation >= 20 &&
+            lightness >= 45 &&
+            lightness <= 85,
+        )
+        .sort(
+          (a, b) =>
+            b.color.population - a.color.population ||
+            b.saturation - a.saturation,
+        )[0];
+
+      if (yellow && !colors.some(({ color }) => color.hex() === yellow.color.hex())) {
+        colors[colors.length - 1] = yellow;
+      }
+    }
+
+    const extractedColors = colors.map(({ color }) => color.hex());
+
+    paletteCache.set(cover, extractedColors);
+    return extractedColors;
   } catch (error) {
     console.warn(`No se pudieron extraer los colores de ${cover}:`, error);
     return null;
