@@ -51,6 +51,28 @@ function splitByViewport(elements: HTMLElement[]) {
   return { now, later };
 }
 
+function showInView(elements: Element[]) {
+  gsap.to(elements, {
+    autoAlpha: 1,
+    y: 0,
+    duration: STAGGER.duration,
+    stagger: STAGGER.each,
+    ease: STAGGER.ease,
+    overwrite: true,
+  });
+}
+
+function hideInView(elements: Element[]) {
+  gsap.to(elements, {
+    autoAlpha: 0,
+    y: STAGGER.distance,
+    duration: STAGGER.duration,
+    stagger: STAGGER.each,
+    ease: "power2.in",
+    overwrite: true,
+  });
+}
+
 /** Oculta los elementos y los muestra con el stagger compartido al entrar en el viewport. */
 function inView(elements: HTMLElement[]) {
   if (!elements.length) return;
@@ -63,19 +85,41 @@ function inView(elements: HTMLElement[]) {
     interval: IN_VIEW.batchInterval,
     once: !IN_VIEW.replay,
     onEnter: (batch) =>
-      gsap.to(batch, {
-        autoAlpha: 1,
-        y: 0,
-        duration: STAGGER.duration,
-        stagger: STAGGER.each,
-        ease: STAGGER.ease,
-        overwrite: true,
-        clearProps: IN_VIEW.replay ? undefined : CLEAR,
-      }),
+      IN_VIEW.replay
+        ? showInView(batch)
+        : gsap.to(batch, {
+            autoAlpha: 1,
+            y: 0,
+            duration: STAGGER.duration,
+            stagger: STAGGER.each,
+            ease: STAGGER.ease,
+            overwrite: true,
+            clearProps: CLEAR,
+          }),
     ...(IN_VIEW.replay && {
-      onLeaveBack: (batch: Element[]) =>
-        gsap.to(batch, { ...hiddenState, duration: STAGGER.duration * 0.6, overwrite: true }),
+      onLeaveBack: (batch: Element[]) => hideInView(batch),
     }),
+  });
+  inViewTriggers.push(...triggers);
+}
+
+/** Permite que los elementos visibles desde el inicio también se reviertan al subir. */
+function trackInitiallyVisible(elements: HTMLElement[]) {
+  if (!IN_VIEW.replay || reducedMotion() || !elements.length) return;
+
+  let hasLeftBack = false;
+  const triggers = ScrollTrigger.batch(elements, {
+    start: IN_VIEW.start,
+    interval: IN_VIEW.batchInterval,
+    onEnter: (batch) => {
+      if (!hasLeftBack) return;
+      hasLeftBack = false;
+      showInView(batch);
+    },
+    onLeaveBack: (batch) => {
+      hasLeftBack = true;
+      hideInView(batch);
+    },
   });
   inViewTriggers.push(...triggers);
 }
@@ -120,7 +164,10 @@ function revealIn(
   vars: gsap.TweenVars = {},
 ) {
   const { now, later } = splitByViewport(toElements(targets));
-  if (now.length) tl.add(contentIn(now, vars), position);
+  if (now.length) {
+    tl.add(contentIn(now, vars), position);
+    trackInitiallyVisible(now);
+  }
   inView(later);
   return tl;
 }

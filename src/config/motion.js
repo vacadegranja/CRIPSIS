@@ -41,8 +41,8 @@ export const IN_VIEW = {
   start: "top 88%",
   /** Agrupa elementos que entran a la vez para aplicarles el stagger. */
   batchInterval: 0.12,
-  /** true = se vuelven a ocultar al salir por arriba / abajo. */
-  replay: false,
+  /** true = se ocultan al volver a desplazarse hacia arriba y aparecen al bajar. */
+  replay: true,
 };
 
 /** Título del home (logo CRIPSIS). */

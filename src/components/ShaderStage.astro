@@ -65,7 +65,7 @@
     const pageKind = () => (document.documentElement.dataset.page || "page") as PageKind;
 
     stage.applyPage(readPageState(), { immediate: true });
-    stage.reveal();
+    const initialReveal = stage.reveal();
 
     /* Hover en botones: [data-shader-hover="#a,#b,#c"] y [data-shader-variant]. */
     const hoverTarget = (event: Event) =>
@@ -96,9 +96,16 @@
       event.loader = async () => {
         homeController?.destroy();
         homeController = null;
+        const pageLoad = loader().then(
+          () => ({ ok: true as const }),
+          (error: unknown) => ({ ok: false as const, error }),
+        );
         document.documentElement.classList.add("is-leaving-page");
         const outro = pageOutro(pageKind());
-        await Promise.all([loader(), stage.cover(), outro.then()]);
+        await outro.then();
+        await stage.cover();
+        const result = await pageLoad;
+        if (!result.ok) throw result.error;
       };
     });
 
@@ -117,16 +124,16 @@
       enteredBodies.add(document.body);
       navigating = false;
       if (hasWelcome()) await runWelcome();
-      // Si venimos de una transición, la vista entra mientras se retira la cubierta.
-      let extraDelay = 0;
+      // El contenido aparece solo cuando el shader terminó de revelar el fondo.
       if (stage.isCovered) {
-        const { holdDuration, uncoverDuration } = stage.settings.transition;
-        extraDelay = holdDuration + uncoverDuration * 0.35;
-        stage.uncover();
+        stage.transitionPageVariant();
+        await stage.uncover();
+      } else {
+        await initialReveal;
       }
       const kind = pageKind();
-      const timeline = kind === "home" ? (homeController = homeIntro()).timeline : playIntro(kind);
-      timeline.delay(timeline.delay() + extraDelay);
+      if (kind === "home") homeController = homeIntro();
+      else playIntro(kind);
     };
 
     document.addEventListener("astro:page-load", enter);

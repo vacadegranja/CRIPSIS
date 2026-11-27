@@ -186,12 +186,15 @@ html.is-welcome .welcome {
 }
 
 .welcome__title {
+  width: min(32rem, 75vw);
   margin: 0 0 clamp(0.5rem, 2vh, 1.5rem);
-  font-size: clamp(3.5rem, 13vw, 9rem);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  line-height: 0.9;
-  text-transform: uppercase;
+}
+
+.welcome__logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: brightness(0) invert(1);
 }
 
 .welcome__text {

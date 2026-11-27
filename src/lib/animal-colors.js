@@ -3,6 +3,16 @@ import path from "node:path";
 import { getPalette } from "colorthief";
 
 const paletteCache = new Map();
+const subjectPalettes = new Map([
+  ["erinaceus_europaeus.jpg", ["#8b6242", "#b18d68", "#4b382d"]],
+  ["hymenopus_coronatus.jpg", ["#f5e9ef", "#e6c6d6", "#c99cb8"]],
+  ["gastropacha_quercifolia.jpg", ["#d5b08a", "#a98259", "#ead1b1"]],
+  ["vulpes_lagopus.jpg", ["#ececed", "#c4c6c8", "#7d8285"]],
+  ["nictibio_urutau.jpg", ["#9d8b72", "#615241", "#c2b49a"]],
+  ["panthera_onca.jpg", ["#e5b97f", "#b77e45", "#664324"]],
+  ["equus_quagga.jpg", ["#f1eee8", "#252321", "#a49d92"]],
+  ["corvus_corax.jpg", ["#191c24", "#343b4c", "#596273"]],
+]);
 
 function muteColor(hex, amount = 0.14) {
   const channels = hex.match(/[a-f\d]{2}/gi)?.map((channel) => Number.parseInt(channel, 16));
@@ -18,10 +28,16 @@ export async function extractAnimalColors(cover) {
   if (!cover) return null;
   if (paletteCache.has(cover)) return paletteCache.get(cover);
 
+  const imageName = path.basename(cover).toLowerCase();
+  const subjectPalette = subjectPalettes.get(imageName);
+  if (subjectPalette) {
+    paletteCache.set(cover, subjectPalette);
+    return subjectPalette;
+  }
+
   try {
     const imagePath = path.resolve(process.cwd(), cover);
     const image = await readFile(imagePath);
-    const imageName = path.basename(cover).toLowerCase();
     const isCaligo = imageName === "caligo_telamonius_memnon.jpg";
     const isSeaDragon = imageName === "phycodurus_eques.jpg";
     const isWasp = path.basename(cover) === "vespula_vulgaris.jpg";

@@ -87,6 +87,10 @@ export class ShaderStage {
   private time = 0;
   private lastFrame = performance.now();
   private variantTween: gsap.core.Tween | null = null;
+  private pagePaletteTween: gsap.core.Tween | null = null;
+  private pagePaletteIsAnimating = false;
+  private pageTransitionActive = false;
+  private pageScrollTween: gsap.core.Tween | null = null;
   private lastTokenWrite = 0;
   private lastTokens = "";
 
@@ -145,7 +149,10 @@ export class ShaderStage {
     this.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.material));
 
     window.addEventListener("resize", this.resize, { passive: true });
-    window.addEventListener("pointermove", this.onPointerMove, { passive: true });
+    window.addEventListener("mousemove", this.onMouseMove, { passive: true });
+    window.addEventListener("touchmove", this.onTouchMove, { passive: true });
+    window.addEventListener("touchend", this.onPointerLeave, { passive: true });
+    window.addEventListener("touchcancel", this.onPointerLeave, { passive: true });
     document.documentElement.addEventListener("pointerleave", this.onPointerLeave, { passive: true });
     window.addEventListener("blur", this.onPointerLeave);
     this.resize();
@@ -158,19 +165,29 @@ export class ShaderStage {
 
   /** Aplica la configuración de una página (paletas, variante y visibilidad). */
   applyPage(state: PageShaderState, { immediate = false } = {}) {
-    this.sequence = state.palettes.map(paletteToColors);
+    const covered = this.isCovered;
+    if (covered && this.variantTween?.isActive()) this.variantTween.progress(1);
+    const nextSequence = state.palettes.map(paletteToColors);
+    const samePaletteSequence =
+      nextSequence.length === this.sequence.length &&
+      nextSequence.every((palette, index) =>
+        palette.every((color, colorIndex) => color.equals(this.sequence[index][colorIndex])),
+      );
+    this.sequence = nextSequence;
     this.pageVariant = state.variant;
     this.targetOpacity = state.opacity;
     this.hoverPalette = null;
     this.hoverVariant = null;
-    this.elapsed = 0;
-    this.updateVariant(immediate);
+    if (immediate || !covered) this.updateVariant(immediate);
     if (immediate) {
       this.computeTarget();
       this.uniforms.uColorA.value.copy(this.target[0]);
       this.uniforms.uColorB.value.copy(this.target[1]);
       this.uniforms.uColorC.value.copy(this.target[2]);
       this.uniforms.uOpacity.value = state.opacity;
+    } else if (this.isCovered && !samePaletteSequence) {
+      this.computeTarget();
+      this.transitionPagePalette(this.target);
     }
   }
 
@@ -204,6 +221,7 @@ export class ShaderStage {
   /** Cubre la pantalla con el shader. Resuelve cuando está totalmente cubierta. */
   cover() {
     this.root.classList.add("is-covering");
+    this.pageTransitionActive = true;
     const duration = this.reducedMotion ? 0.2 : this.settings.transition.coverDuration;
     return gsap.to(this.uniforms.uCover, {
       value: 1,
@@ -217,6 +235,18 @@ export class ShaderStage {
   uncover(delay = this.settings.transition.holdDuration) {
     const duration = this.reducedMotion ? 0.2 : this.settings.transition.uncoverDuration;
     this.uniforms.uReveal.value = 1;
+    this.pageScrollTween?.kill();
+    const scrollTarget = (window.scrollY / Math.max(window.innerHeight, 1)) * this.settings.pattern.scrollFactor;
+    this.pageScrollTween = gsap.to(this.uniforms.uScroll, {
+      value: scrollTarget,
+      duration,
+      delay: this.reducedMotion ? 0 : delay,
+      ease: "power2.inOut",
+      overwrite: true,
+      onComplete: () => {
+        this.pageTransitionActive = false;
+      },
+    });
     return gsap.to(this.uniforms.uCover, {
       value: 0,
       duration,
@@ -235,6 +265,45 @@ export class ShaderStage {
 
   get isCovered() {
     return this.uniforms.uCover.value > 0.001;
+  }
+
+  transitionPageVariant() {
+    this.updateVariant(false);
+  }
+
+  private transitionPagePalette(colors: [THREE.Color, THREE.Color, THREE.Color]) {
+    this.pagePaletteTween?.kill();
+    const uniforms = [
+      this.uniforms.uColorA.value,
+      this.uniforms.uColorB.value,
+      this.uniforms.uColorC.value,
+    ];
+    const start = uniforms.map(({ r, g, b }) => ({ r, g, b }));
+    const end = colors.map(({ r, g, b }) => ({ r, g, b }));
+    const progress = { value: 0 };
+    const duration = this.reducedMotion ? 0 : Math.max(this.settings.transition.uncoverDuration, 0.8);
+    this.pagePaletteIsAnimating = true;
+
+    this.pagePaletteTween = gsap.to(progress, {
+      value: 1,
+      duration,
+      ease: "sine.inOut",
+      onUpdate: () => {
+        uniforms.forEach((color, index) => {
+          color.setRGB(
+            THREE.MathUtils.lerp(start[index].r, end[index].r, progress.value),
+            THREE.MathUtils.lerp(start[index].g, end[index].g, progress.value),
+            THREE.MathUtils.lerp(start[index].b, end[index].b, progress.value),
+          );
+        });
+      },
+      onComplete: () => {
+        this.pagePaletteIsAnimating = false;
+      },
+      onInterrupt: () => {
+        this.pagePaletteIsAnimating = false;
+      },
+    });
   }
 
   /* ------------------------------------------------------------------ */
@@ -330,12 +399,21 @@ export class ShaderStage {
     this.uniforms.uResolution.value.set(width, height);
   };
 
-  private onPointerMove = (event: PointerEvent) => {
+  private updatePointerPosition = (clientX: number, clientY: number) => {
     this.pointerTarget.set(
-      THREE.MathUtils.clamp(event.clientX / window.innerWidth, 0, 1),
-      THREE.MathUtils.clamp(1 - event.clientY / window.innerHeight, 0, 1),
+      THREE.MathUtils.clamp(clientX / window.innerWidth, 0, 1),
+      THREE.MathUtils.clamp(1 - clientY / window.innerHeight, 0, 1),
     );
     this.pointerActive = 1;
+  };
+
+  private onMouseMove = (event: MouseEvent) => {
+    this.updatePointerPosition(event.clientX, event.clientY);
+  };
+
+  private onTouchMove = (event: TouchEvent) => {
+    const touch = event.touches[0];
+    if (touch) this.updatePointerPosition(touch.clientX, touch.clientY);
   };
 
   private onPointerLeave = () => {
@@ -350,7 +428,7 @@ export class ShaderStage {
     const s = this.settings;
 
     if (!this.reducedMotion) {
-      this.elapsed += dt;
+      if (!this.pagePaletteIsAnimating) this.elapsed += dt;
       this.time += dt * s.pattern.speed;
     }
     this.syncSettings();
@@ -358,13 +436,17 @@ export class ShaderStage {
 
     // Suavizado exponencial: los colores siguen siempre a la paleta objetivo.
     const colorAmount = 1 - Math.exp(-dt * s.color.colorEase);
-    u.uColorA.value.lerp(this.target[0], colorAmount);
-    u.uColorB.value.lerp(this.target[1], colorAmount);
-    u.uColorC.value.lerp(this.target[2], colorAmount);
+    if (!this.pagePaletteIsAnimating) {
+      u.uColorA.value.lerp(this.target[0], colorAmount);
+      u.uColorB.value.lerp(this.target[1], colorAmount);
+      u.uColorC.value.lerp(this.target[2], colorAmount);
+    }
     u.uOpacity.value += (this.targetOpacity - u.uOpacity.value) * colorAmount;
 
     u.uTime.value = this.time;
-    u.uScroll.value = (window.scrollY / Math.max(window.innerHeight, 1)) * s.pattern.scrollFactor;
+    if (!this.pageTransitionActive) {
+      u.uScroll.value = (window.scrollY / Math.max(window.innerHeight, 1)) * s.pattern.scrollFactor;
+    }
     u.uPointer.value.lerp(this.pointerTarget, s.pointer.follow);
     u.uPointerActive.value += (this.pointerActive - u.uPointerActive.value) * s.pointer.fade;
 
