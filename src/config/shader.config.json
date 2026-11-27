@@ -1,0 +1,43 @@
+{
+  "pattern": {
+    "speed": 1,
+    "intensity": 0.82,
+    "flowScale": 2.1,
+    "flowStrength": 0.34,
+    "fieldScale": 4.1,
+    "bandFrequency": 9,
+    "lineWidth": 0.035,
+    "lineSoftness": 0.07,
+    "haloStrength": 0.22,
+    "scrollFactor": 1
+  },
+  "pointer": {
+    "radius": 17,
+    "strength": 0.1,
+    "follow": 0.13,
+    "fade": 0.09
+  },
+  "color": {
+    "cycleDuration": 2.4,
+    "colorEase": 4,
+    "variantDuration": 0.9,
+    "override": false,
+    "colorA": "#c4a060",
+    "colorB": "#e6c98a",
+    "colorC": "#fff0ce",
+    "variantOverride": -1
+  },
+  "transition": {
+    "coverDuration": 0.9,
+    "holdDuration": 0.35,
+    "uncoverDuration": 1.1,
+    "edge": 0.08,
+    "noiseScale": 2.6,
+    "direction": 0.45,
+    "glow": 0.9,
+    "lineContrast": 0.55
+  },
+  "render": {
+    "maxPixelRatio": 1.25
+  }
+}

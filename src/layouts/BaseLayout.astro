@@ -1,8 +1,13 @@
 ---
 import { ClientRouter } from "astro:transitions";
 import Logo from "../components/Logo.astro";
-import OrganicPattern from "../components/OrganicPattern.astro";
+import ShaderStage from "../components/ShaderStage.astro";
+import Welcome from "../components/Welcome.astro";
+import { elements } from "../data/animals.js";
 import "../styles/global.css";
+import "../styles/tokens.css";
+
+type PageKind = "home" | "element" | "animal" | "info" | "cam" | "page";
 
 interface Props {
   title: string;
@@ -14,6 +19,8 @@ interface Props {
   patternPalettes?: string[][];
   patternVariant?: number;
   animalColors?: string[];
+  /** Tipo de vista: decide la timeline de entrada y los tokens CSS por vista. */
+  page?: PageKind;
 }
 
 const {
@@ -26,6 +33,7 @@ const {
   patternPalettes,
   patternVariant = 0,
   animalColors,
+  page = home ? "home" : cam ? "cam" : "page",
 } = Astro.props;
 
 const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
@@ -33,10 +41,34 @@ const asset = (path: string) => `${base}${path.replace(/^\//, "")}`;
 const animalStyle = animalColors && animalColors.length >= 3
   ? `--animal-color-a:${animalColors[0]};--animal-color-b:${animalColors[1]};--animal-color-c:${animalColors[2]};--page-background:linear-gradient(135deg,color-mix(in srgb,${animalColors[0]} 82%,${animalColors[1]} 18%),color-mix(in srgb,${animalColors[1]} 68%,${animalColors[2]} 32%),${animalColors[2]})`
   : undefined;
+
+// Paletas para el shader persistente y los tokens CSS (--page-a/b/c).
+const defaultPalettes = [
+  elements.aire.patternColors,
+  elements.agua.patternColors,
+  elements.tierra.patternColors,
+];
+const shaderPalettes = patternPalettes ?? (patternColors ? [patternColors] : defaultPalettes);
+const [pageA, pageB, pageC] = shaderPalettes[0];
+const rootStyle = `--page-a:${pageA};--page-b:${pageB};--page-c:${pageC}`;
+const elementLinks = (["aire", "tierra", "agua"] as const).map((key) => ({
+  key,
+  palette: elements[key].patternColors.join(","),
+  variant: elements[key].patternVariant,
+}));
 ---
 
 <!doctype html>
-<html lang="es">
+<html
+  lang="es"
+  class="motion-pending"
+  transition:animate="none"
+  data-page={page}
+  data-shader-palettes={JSON.stringify(shaderPalettes)}
+  data-shader-variant={patternVariant}
+  data-shader-opacity={cam ? 0 : 1}
+  style={rootStyle}
+>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -44,19 +76,18 @@ const animalStyle = animalColors && animalColors.length >= 3
     <meta name="theme-color" content="#000000" />
     <title>{title}</title>
     <ClientRouter />
+    <noscript>
+      <style>
+        html.motion-pending .site-shell > * { visibility: visible !important; animation: none !important; }
+      </style>
+    </noscript>
   </head>
   <body
     class:list={[theme, { "home-page": home, "cam-page-body": cam }]}
     style={animalStyle}
   >
-    {!home && !cam && patternColors && (
-      <OrganicPattern
-        colors={patternColors}
-        palettes={patternPalettes}
-        variant={patternVariant}
-        class="site-pattern"
-      />
-    )}
+    <Welcome />
+    <ShaderStage />
     <div class="site-shell">
       <header class="site-header">
         <nav class="top-nav" aria-label="Navegación principal">
@@ -102,9 +133,15 @@ const animalStyle = animalColors && animalColors.length >= 3
                       aria-hidden="true"
                       inert
                     >
-                      <a href={`${base}aire/`}>aire</a>
-                      <a href={`${base}tierra/`}>tierra</a>
-                      <a href={`${base}agua/`}>agua</a>
+                      {elementLinks.map(({ key, palette, variant }) => (
+                        <a
+                          href={`${base}${key}/`}
+                          data-shader-hover={palette}
+                          data-shader-variant={variant}
+                        >
+                          {key}
+                        </a>
+                      ))}
                     </div>
                   </div>
                   <a class="info-link" href={`${base}info/`}>info</a>

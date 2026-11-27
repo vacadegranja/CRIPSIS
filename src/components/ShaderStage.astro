@@ -1,0 +1,140 @@
+---
+/**
+ * Canvas WebGL único y persistente entre páginas (transition:persist).
+ * Lee la paleta de cada vista desde <html data-shader-*>, cambia de color
+ * al hacer hover en elementos [data-shader-hover] y cubre la pantalla con
+ * el propio patrón durante la navegación.
+ */
+---
+
+<div class="shader-stage" transition:persist="shader-stage" aria-hidden="true">
+  <canvas class="shader-stage__canvas"></canvas>
+</div>
+<div class="shader-gui" transition:persist="shader-gui"></div>
+
+<style is:global>
+  .shader-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .shader-stage.is-covering {
+    z-index: 10000;
+  }
+
+  .shader-stage__canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .shader-gui {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 10001;
+  }
+
+  .shader-gui:empty {
+    display: none;
+  }
+</style>
+
+<script>
+  import { ShaderStage, cloneDefaults, readPageState, type Palette } from "../lib/shader/ShaderStage";
+  import { createShaderGui, shouldShowGui } from "../lib/shader/shader-gui";
+  import { hasWelcome, runWelcome } from "../lib/motion/welcome";
+  import {
+    homeIntro,
+    killInView,
+    pageOutro,
+    playIntro,
+    type HomeTitleController,
+    type PageKind,
+  } from "../lib/motion/timelines";
+
+  const root = document.querySelector<HTMLElement>(".shader-stage");
+  const canvas = root?.querySelector<HTMLCanvasElement>("canvas");
+
+  if (root && canvas) {
+    const stage = new ShaderStage(root, canvas, cloneDefaults());
+    let homeController: HomeTitleController | null = null;
+    let navigating = false;
+    const pageKind = () => (document.documentElement.dataset.page || "page") as PageKind;
+
+    stage.applyPage(readPageState(), { immediate: true });
+    stage.reveal();
+
+    /* Hover en botones: [data-shader-hover="#a,#b,#c"] y [data-shader-variant]. */
+    const hoverTarget = (event: Event) =>
+      (event.target as Element | null)?.closest?.<HTMLElement>("[data-shader-hover]") ?? null;
+    const onEnter = (event: Event) => {
+      const el = hoverTarget(event);
+      if (!el) return;
+      const palette = el.dataset.shaderHover!.split(",") as Palette;
+      const variant = el.dataset.shaderVariant;
+      stage.setHover(palette, variant === undefined ? null : Number(variant));
+    };
+    const onLeave = (event: Event) => {
+      const el = hoverTarget(event);
+      if (!el || navigating) return;
+      const next = (event as PointerEvent | FocusEvent).relatedTarget as Element | null;
+      if (next && el.contains(next)) return;
+      stage.setHover(null);
+    };
+    document.addEventListener("pointerover", onEnter);
+    document.addEventListener("focusin", onEnter);
+    document.addEventListener("pointerout", onLeave);
+    document.addEventListener("focusout", onLeave);
+
+    /* Salida: la página se desvanece y el shader cubre la pantalla mientras carga la siguiente. */
+    document.addEventListener("astro:before-preparation", (event) => {
+      const loader = event.loader;
+      navigating = true;
+      event.loader = async () => {
+        homeController?.destroy();
+        homeController = null;
+        document.documentElement.classList.add("is-leaving-page");
+        const outro = pageOutro(pageKind());
+        await Promise.all([loader(), stage.cover(), outro.then()]);
+      };
+    });
+
+    /* Tras el intercambio: se aplican los colores de la nueva vista bajo la cubierta. */
+    document.addEventListener("astro:before-swap", killInView);
+    document.addEventListener("astro:after-swap", () => {
+      stage.invalidateTokens();
+      stage.applyPage(readPageState());
+    });
+
+    /* Entrada: descubre el shader y arranca la timeline de la vista. */
+    const enteredBodies = new WeakSet<HTMLElement>();
+    const enter = async () => {
+      // Se llama al arrancar y en cada astro:page-load; cada <body> entra una sola vez.
+      if (enteredBodies.has(document.body)) return;
+      enteredBodies.add(document.body);
+      navigating = false;
+      if (hasWelcome()) await runWelcome();
+      // Si venimos de una transición, la vista entra mientras se retira la cubierta.
+      let extraDelay = 0;
+      if (stage.isCovered) {
+        const { holdDuration, uncoverDuration } = stage.settings.transition;
+        extraDelay = holdDuration + uncoverDuration * 0.35;
+        stage.uncover();
+      }
+      const kind = pageKind();
+      const timeline = kind === "home" ? (homeController = homeIntro()).timeline : playIntro(kind);
+      timeline.delay(timeline.delay() + extraDelay);
+    };
+
+    document.addEventListener("astro:page-load", enter);
+    enter();
+
+    if (shouldShowGui()) {
+      const container = document.querySelector<HTMLElement>(".shader-gui");
+      if (container && !container.childElementCount) createShaderGui(stage, container);
+    }
+  }
+</script>

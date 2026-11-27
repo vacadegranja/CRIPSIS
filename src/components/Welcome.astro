@@ -1,0 +1,40 @@
+---
+import { WELCOME } from "../config/motion.js";
+
+const once = WELCOME.oncePerSession;
+---
+
+<script is:inline define:vars={{ once }}>
+  // Solo en la primera carga del documento (no en navegaciones del ClientRouter).
+  (function () {
+    if (window.__cripsisWelcome) return;
+    window.__cripsisWelcome = true;
+    try {
+      if (once && sessionStorage.getItem("cripsis-welcome-seen")) return;
+    } catch (error) {
+      /* almacenamiento no disponible */
+    }
+    document.documentElement.classList.add("is-welcome");
+  })();
+</script>
+
+<div class="welcome" data-welcome role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+  <div class="welcome__inner">
+    <h2 id="welcome-title" class="welcome__title" data-welcome-item>cripsis</h2>
+    <p class="welcome__text" data-welcome-item>
+      En la naturaleza, animales y plantas se comunican mediante señales visuales, sonidos, olores
+      y texturas.
+    </p>
+    <p class="welcome__text" data-welcome-item>
+      CRIPSIS explora el mimetismo, el camuflaje y el aposematismo como estrategias distintas con
+      las que cada especie transmite información.
+    </p>
+    <div class="welcome__loader" data-welcome-item data-welcome-loader aria-hidden="true">
+      <span class="welcome__track"><span class="welcome__bar" data-welcome-bar></span></span>
+      <span class="welcome__percent" data-welcome-percent>0%</span>
+    </div>
+    <button class="welcome__cta" type="button" data-welcome-item data-welcome-cta disabled>
+      descubre
+    </button>
+  </div>
+</div>

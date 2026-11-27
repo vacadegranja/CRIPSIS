@@ -1,0 +1,258 @@
+/*
+ * Tokens de color por vista.
+ *
+ * Cada página declara su paleta en <html style="--page-a; --page-b; --page-c">
+ * (BaseLayout.astro) y el shader publica en tiempo real la paleta que está
+ * mostrando como --live-a / --live-b / --live-c (hover, ciclos, transiciones).
+ * Los tokens --palette-* usan la paleta viva y, sin JS, la de la página.
+ *
+ * Para personalizar una vista, sobrescribe tokens en su bloque
+ * :root[data-page="…"] más abajo.
+ */
+:root {
+  --palette-a: var(--live-a, var(--page-a, #c4a060));
+  --palette-b: var(--live-b, var(--page-b, #e6c98a));
+  --palette-c: var(--live-c, var(--page-c, #fff0ce));
+
+  /* Semánticos */
+  --view-accent: var(--palette-a);
+  --view-accent-strong: color-mix(in srgb, var(--palette-a) 70%, #000);
+  --view-highlight: var(--palette-c);
+  --view-text: #ffffff;
+  --view-text-muted: color-mix(in srgb, var(--palette-c) 55%, #ffffff);
+  --view-surface: color-mix(in srgb, var(--palette-a) 18%, rgb(0 0 0 / 0.42));
+  --view-surface-strong: color-mix(in srgb, var(--palette-a) 30%, rgb(0 0 0 / 0.62));
+  --view-border: color-mix(in srgb, var(--palette-c) 32%, transparent);
+  --view-focus: var(--palette-c);
+  --view-selection-bg: var(--palette-b);
+  --view-selection-text: #000000;
+
+  /* Bienvenida */
+  --welcome-backdrop: color-mix(in srgb, var(--palette-a) 14%, rgb(0 0 0 / 0.82));
+  --welcome-text: var(--view-text);
+  --welcome-accent: var(--palette-c);
+
+  /* Scroll */
+  --scrollbar-size: 10px;
+  --scrollbar-radius: 999px;
+  --scrollbar-track: color-mix(in srgb, var(--palette-a) 12%, #000000);
+  --scrollbar-thumb: color-mix(in srgb, var(--palette-b) 75%, transparent);
+  --scrollbar-thumb-hover: var(--palette-c);
+}
+
+/* ---- Personalización por vista ------------------------------------------ */
+
+:root[data-page="home"] {
+  --scrollbar-track: #000000;
+}
+
+:root[data-page="element"] {
+  --view-surface: color-mix(in srgb, var(--palette-a) 22%, rgb(0 0 0 / 0.4));
+}
+
+:root[data-page="animal"] {
+  --view-border: color-mix(in srgb, var(--palette-c) 45%, transparent);
+  --scrollbar-thumb: color-mix(in srgb, var(--palette-c) 70%, transparent);
+}
+
+:root[data-page="info"] {
+  --view-surface: color-mix(in srgb, var(--palette-a) 16%, rgb(0 0 0 / 0.45));
+  --scrollbar-thumb: color-mix(in srgb, var(--palette-a) 85%, #ffffff 15%);
+}
+
+:root[data-page="cam"] {
+  --scrollbar-track: #000000;
+}
+
+/* ---- Scroll custom ------------------------------------------------------- */
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scroll-behavior: auto;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+/* Safari / navegadores sin scrollbar-color */
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid var(--scrollbar-track);
+    border-radius: var(--scrollbar-radius);
+    background: var(--scrollbar-thumb);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+}
+
+::selection {
+  background: var(--view-selection-bg);
+  color: var(--view-selection-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--view-focus);
+  outline-offset: 3px;
+}
+
+/* ---- Componentes con tokens --------------------------------------------- */
+
+.info-question-card,
+.info-intro-card {
+  background: var(--view-surface);
+}
+
+.animal-card {
+  border-color: var(--view-border);
+}
+
+.animal-facts div {
+  border-color: var(--view-border);
+}
+
+.related-modes button:hover,
+.related-modes button:focus-visible,
+.related-modes button[aria-pressed="true"] {
+  background: var(--view-highlight);
+  color: #000000;
+}
+
+/* ---- Estado inicial (GSAP) ---------------------------------------------- */
+
+/* Todo oculto hasta que arranca la timeline de la vista. */
+html.motion-pending .site-shell > * {
+  visibility: hidden;
+  /* Seguridad: si el JS falla, el contenido aparece igualmente. */
+  animation: motion-failsafe 0s linear 6s forwards;
+}
+
+html.is-welcome.motion-pending .site-shell > * {
+  animation: none;
+}
+
+@keyframes motion-failsafe {
+  to {
+    visibility: visible;
+  }
+}
+
+/* Mientras se cubre la pantalla, ninguna transición CSS compite con GSAP. */
+html.is-leaving-page .site-shell * {
+  transition: none !important;
+}
+
+/* ---- Pantalla de bienvenida --------------------------------------------- */
+
+.welcome {
+  display: none;
+}
+
+html.is-welcome {
+  overflow: hidden;
+}
+
+html.is-welcome .welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: grid;
+  place-items: center;
+  padding: var(--page-margin);
+  background: var(--welcome-backdrop);
+  color: var(--welcome-text);
+  text-align: center;
+  backdrop-filter: blur(6px);
+}
+
+.welcome__inner {
+  display: grid;
+  max-width: 46rem;
+  justify-items: center;
+  gap: clamp(1rem, 2.5vh, 1.75rem);
+}
+
+.welcome__title {
+  margin: 0 0 clamp(0.5rem, 2vh, 1.5rem);
+  font-size: clamp(3.5rem, 13vw, 9rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.welcome__text {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  letter-spacing: 0.02em;
+  line-height: 1.55;
+}
+
+.welcome__loader {
+  display: flex;
+  width: min(18rem, 70vw);
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: clamp(1rem, 4vh, 2.5rem);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+}
+
+.welcome__track {
+  position: relative;
+  height: 2px;
+  flex: 1;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--welcome-accent) 25%, transparent);
+}
+
+.welcome__bar {
+  position: absolute;
+  inset: 0;
+  background: var(--welcome-accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.welcome__percent {
+  min-width: 3ch;
+  font-variant-numeric: tabular-nums;
+}
+
+.welcome__cta {
+  margin-top: clamp(1rem, 4vh, 2.5rem);
+  padding: 0.85rem 2.4rem;
+  border: 1px solid var(--welcome-accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--welcome-text);
+  font: inherit;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
+  cursor: pointer;
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+.welcome__cta:hover,
+.welcome__cta:focus-visible {
+  background: var(--welcome-accent);
+  color: #000000;
+}
+
+.welcome__cta:disabled {
+  cursor: default;
+}

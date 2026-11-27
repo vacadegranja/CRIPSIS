@@ -34,76 +34,9 @@ body {
   transition: background-color 700ms ease, color 700ms ease;
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 620ms;
-  animation-timing-function: cubic-bezier(.55, 0, .2, 1);
-}
-
-::view-transition-old(root) {
-  animation-name: page-fade-out;
-}
-
-::view-transition-new(root) {
-  animation-name: page-reveal;
-}
-
-@keyframes page-fade-out {
-  to {
-    opacity: 0;
-    filter: blur(12px);
-  }
-}
-
-@keyframes page-reveal {
-  from {
-    opacity: 0;
-    filter: blur(12px);
-  }
-}
-
 body.home-theme {
   --color-background: #000000;
   --color-text: #ffffff;
-}
-
-.home-transition {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  pointer-events: none;
-  transform-origin: top left;
-  transition: transform 680ms cubic-bezier(.55, 0, .2, 1);
-}
-
-.home-transition--aire {
-  background: var(--color-accent-air);
-}
-
-.home-transition--tierra {
-  background: var(--color-accent-earth);
-}
-
-.home-transition--agua {
-  background: var(--color-accent-water);
-}
-
-.home-transition.is-expanded {
-  transform: translate3d(0, 0, 0) scale(1) !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .home-transition {
-    transition-duration: 1ms;
-  }
-}
-
-body.home-theme.is-leaving .hero-home,
-body.home-theme.is-leaving .home-sections {
-  opacity: 0;
-  filter: blur(18px);
-  transform: scale(1.04);
-  pointer-events: none;
 }
 
 body.home-theme.is-choice-active .hero-home {
@@ -465,54 +398,13 @@ footer {
   fill: #fff;
 }
 
+/* Opacidad, desenfoque y movimiento de cada carácter: GSAP (src/lib/motion/timelines.ts). */
 .home-logo-glyph {
   display: inline;
   cursor: default;
-  opacity: 1;
-  filter: blur(0);
   transform-box: fill-box;
   transform-origin: center;
-  transition: opacity 350ms ease, filter 350ms ease, transform 350ms ease;
-  animation: home-glyph-intro 900ms ease backwards;
   outline: none;
-}
-
-.home-logo-glyph:nth-child(2n) {
-  animation-delay: 70ms;
-}
-
-.home-logo-glyph:nth-child(3n) {
-  animation-delay: 140ms;
-}
-
-.home-logo-glyph:hover,
-.home-logo-glyph:focus-visible,
-.home-logo-glyph.is-hovered {
-  animation: none;
-  opacity: 1;
-  filter: blur(0);
-  transform: translateY(-0.04em);
-}
-
-@keyframes home-glyph-intro {
-  0% {
-    opacity: 1;
-    filter: blur(0);
-  }
-  65% {
-    opacity: 1;
-    filter: blur(0);
-  }
-  100% {
-    opacity: 0;
-    filter: blur(10px);
-  }
-}
-
-.home-logo-glyph:not(:hover):not(:focus-visible):not(.is-hovered) {
-  animation-name: home-glyph-intro;
-  animation-duration: 900ms;
-  animation-fill-mode: forwards;
 }
 
 .hero-home .home-tagline {
@@ -536,7 +428,7 @@ body.home-theme.is-choice-active .home-tagline {
   }
 }
 
-body.home-page.home-theme .hero-home .letter-title span {
+.letter-title span {
   animation-name: home-title-intro;
   animation-duration: 900ms;
   animation-delay: 0ms;
@@ -576,29 +468,13 @@ body.home-page.home-theme .hero-home .letter-title:hover span {
   opacity: 0.12;
   filter: blur(3px);
   transition: opacity 350ms ease, filter 350ms ease, transform 350ms ease;
-  animation: letter-intro 900ms ease backwards;
   min-width: .2em;
-}
-
-.letter-title span:nth-child(2n) {
-  animation-delay: 70ms;
-}
-
-.letter-title span:nth-child(3n) {
-  animation-delay: 140ms;
 }
 
 .letter-title span:hover {
   opacity: 1;
   filter: blur(0);
   transform: translateY(-0.04em);
-}
-
-@keyframes letter-intro {
-  from {
-    opacity: 1;
-    filter: blur(0);
-  }
 }
 
 .hero p {
@@ -1251,11 +1127,7 @@ footer {
   overflow: hidden;
 }
 
-.organic-section > .organic-pattern {
-  z-index: 0;
-}
-
-.organic-section > :not(.organic-pattern) {
+.organic-section > * {
   box-sizing: border-box;
   position: relative;
   z-index: 1;
@@ -1275,12 +1147,6 @@ footer {
 
 .organic-section .animal-detail {
   position: relative;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .organic-pattern {
-    opacity: 0.75;
-  }
 }
 
 /* El contenedor recibe el movimiento del cursor en zonas libres; el canvas no bloquea enlaces. */

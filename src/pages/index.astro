@@ -51,6 +51,8 @@ const entries = elementKeys.map((key) => ({
           class={`home-line home-line-${element.key}`}
           href={`${base}${element.key}/`}
           aria-label={element.name}
+          data-shader-hover={element.patternColors.join(",")}
+          data-shader-variant={element.patternVariant}
         >
           <h3>{element.name}</h3>
         </a>
@@ -60,8 +62,11 @@ const entries = elementKeys.map((key) => ({
 </BaseLayout>
 
 <script>
-  import { navigate } from "astro:transitions/client";
-
+  /*
+   * Interacciones del home. Las entradas/salidas (título, botones) viven en
+   * src/lib/motion/timelines.ts y el cambio de color del shader al hover en
+   * los botones se declara con data-shader-hover / data-shader-variant.
+   */
   function initializeHome() {
     if (!document.body.classList.contains("home-page")) return;
 
@@ -69,80 +74,22 @@ const entries = elementKeys.map((key) => ({
     if (!homeSections || homeSections.dataset.interactionsReady === "true") return;
     homeSections.dataset.interactionsReady = "true";
 
-    document
-      .querySelectorAll<SVGGElement>(".hero-home .home-logo-glyph")
-      .forEach((glyph) => {
-        glyph.addEventListener("pointerenter", () => {
-          glyph.classList.add("is-hovered");
-        });
-        glyph.addEventListener("pointerleave", () => {
-          glyph.classList.remove("is-hovered");
-        });
-        glyph.addEventListener("focus", () => {
-          glyph.classList.add("is-hovered");
-        });
-        glyph.addEventListener("blur", () => {
-          glyph.classList.remove("is-hovered");
-        });
-      });
-
-    homeSections.addEventListener("pointerenter", () => {
-      document.body.classList.add("is-choice-active");
-    });
+    // Mientras el título está en su fase de entrada no se activa el modo elección
+    // (p. ej. si el cursor quedó sobre un botón al pulsar "descubre").
+    const canChoose = () => !document.body.classList.contains("home-intro-running");
+    const activate = () => {
+      if (canChoose()) document.body.classList.add("is-choice-active");
+    };
+    homeSections.addEventListener("pointerenter", activate);
+    homeSections.addEventListener("pointermove", activate);
     homeSections.addEventListener("pointerleave", () => {
-      if (!document.body.classList.contains("is-leaving")) {
-        document.body.classList.remove("is-choice-active");
-      }
+      document.body.classList.remove("is-choice-active");
     });
-    homeSections.addEventListener("focusin", () => {
-      document.body.classList.add("is-choice-active");
-    });
+    homeSections.addEventListener("focusin", activate);
     homeSections.addEventListener("focusout", (event) => {
       if (!(event.relatedTarget instanceof Node && homeSections.contains(event.relatedTarget))) {
         document.body.classList.remove("is-choice-active");
       }
-    });
-
-    document.querySelectorAll<HTMLAnchorElement>(".home-line").forEach((link) => {
-      link.addEventListener("click", (event) => {
-        if (
-          event.button !== 0 ||
-          event.metaKey ||
-          event.ctrlKey ||
-          event.shiftKey ||
-          event.altKey
-        ) return;
-
-        event.preventDefault();
-        if (document.body.classList.contains("is-leaving")) return;
-
-        const href = link.href;
-        const bounds = link.getBoundingClientRect();
-        const transition = document.createElement("div");
-        const selectedElement = Array.from(link.classList)
-          .find((className) => className.startsWith("home-line-"))
-          ?.replace("home-line-", "");
-        if (!selectedElement) return;
-
-        transition.className = `home-transition home-transition--${selectedElement}`;
-        transition.setAttribute("aria-hidden", "true");
-        transition.style.transform =
-          `translate3d(${bounds.left}px, ${bounds.top}px, 0) ` +
-          `scale(${bounds.width / window.innerWidth}, ${bounds.height / window.innerHeight})`;
-        document.body.append(transition);
-
-        document.body.classList.add("is-leaving");
-
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            transition.classList.add("is-expanded");
-          });
-        });
-
-        window.setTimeout(() => {
-          navigate(href);
-        }, 680);
-      });
     });
   }
 
