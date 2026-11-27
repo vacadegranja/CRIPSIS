@@ -10,7 +10,6 @@
 <div class="shader-stage" transition:persist="shader-stage" aria-hidden="true">
   <canvas class="shader-stage__canvas"></canvas>
 </div>
-<div class="shader-gui" transition:persist="shader-gui"></div>
 
 <style is:global>
   .shader-stage {
@@ -30,21 +29,10 @@
     height: 100%;
   }
 
-  .shader-gui {
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 10001;
-  }
-
-  .shader-gui:empty {
-    display: none;
-  }
 </style>
 
 <script>
   import { ShaderStage, cloneDefaults, readPageState, type Palette } from "../lib/shader/ShaderStage";
-  import { createShaderGui, shouldShowGui } from "../lib/shader/shader-gui";
   import { hasWelcome, runWelcome } from "../lib/motion/welcome";
   import {
     homeIntro,
@@ -138,10 +126,5 @@
 
     document.addEventListener("astro:page-load", enter);
     enter();
-
-    if (shouldShowGui()) {
-      const container = document.querySelector<HTMLElement>(".shader-gui");
-      if (container && !container.childElementCount) createShaderGui(stage, container);
-    }
   }
 </script>

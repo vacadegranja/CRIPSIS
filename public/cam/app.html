@@ -78,14 +78,13 @@ function closeInstructions(){
 function openInstructions(){
  instructions.classList.remove('is-hidden');
 }
-instructions.addEventListener('click',event=>{
- if(event.target===instructions)closeInstructions();
+helpButton.addEventListener('click',event=>{
+ event.stopPropagation();
+ if(instructions.classList.contains('is-hidden'))openInstructions();
+ else closeInstructions();
 });
-helpButton.addEventListener('click',openInstructions);
 document.addEventListener('click',event=>{
- if(!instructions.classList.contains('is-hidden')&&!instructions.querySelector('.instructions-dialog').contains(event.target)&&event.target!==helpButton){
-  closeInstructions();
- }
+ if(!instructions.classList.contains('is-hidden'))closeInstructions();
 });
 const SETTINGS={particleDensity:80,particleLimit:38000,particleMinSize:.75,particleSizeRange:1.35,faceScaleX:1.75,faceScaleY:1.75,explosionScaleX:3.8,explosionScaleY:3.2};
 let landmarker=null,handLandmarker=null,stream=null,particles=[],face=null,exploding=false,imageTarget=null,lastVideoTime=-1,raf=0,mouse={x:-9999,y:-9999},imagePixels={};

@@ -14,7 +14,7 @@ uniform float uVariantA;
 uniform float uVariantB;
 uniform float uVariantMix;
 
-// Parámetros del patrón (dat.gui).
+// Parámetros visuales del patrón.
 uniform float uIntensity;
 uniform float uFlowScale;
 uniform float uFlowStrength;
