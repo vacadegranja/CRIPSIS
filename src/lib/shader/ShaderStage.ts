@@ -90,7 +90,7 @@ export class ShaderStage {
   private pagePaletteTween: gsap.core.Tween | null = null;
   private pagePaletteIsAnimating = false;
   private pageTransitionActive = false;
-  private pageScrollTween: gsap.core.Tween | null = null;
+  private scrollOffset = 0;
   private lastTokenWrite = 0;
   private lastTokens = "";
 
@@ -235,25 +235,18 @@ export class ShaderStage {
   uncover(delay = this.settings.transition.holdDuration) {
     const duration = this.reducedMotion ? 0.2 : this.settings.transition.uncoverDuration;
     this.uniforms.uReveal.value = 1;
-    this.pageScrollTween?.kill();
-    const scrollTarget = (window.scrollY / Math.max(window.innerHeight, 1)) * this.settings.pattern.scrollFactor;
-    this.pageScrollTween = gsap.to(this.uniforms.uScroll, {
-      value: scrollTarget,
-      duration,
-      delay: this.reducedMotion ? 0 : delay,
-      ease: "power2.inOut",
-      overwrite: true,
-      onComplete: () => {
-        this.pageTransitionActive = false;
-      },
-    });
+    const scrollScale = this.settings.pattern.scrollFactor / Math.max(window.innerHeight, 1);
+    this.scrollOffset = this.uniforms.uScroll.value - window.scrollY * scrollScale;
     return gsap.to(this.uniforms.uCover, {
       value: 0,
       duration,
       delay: this.reducedMotion ? 0 : delay,
       ease: "power2.inOut",
       overwrite: true,
-      onComplete: () => this.root.classList.remove("is-covering"),
+      onComplete: () => {
+        this.pageTransitionActive = false;
+        this.root.classList.remove("is-covering");
+      },
     });
   }
 
@@ -445,7 +438,9 @@ export class ShaderStage {
 
     u.uTime.value = this.time;
     if (!this.pageTransitionActive) {
-      u.uScroll.value = (window.scrollY / Math.max(window.innerHeight, 1)) * s.pattern.scrollFactor;
+      u.uScroll.value =
+        (window.scrollY / Math.max(window.innerHeight, 1)) * s.pattern.scrollFactor +
+        this.scrollOffset;
     }
     u.uPointer.value.lerp(this.pointerTarget, s.pointer.follow);
     u.uPointerActive.value += (this.pointerActive - u.uPointerActive.value) * s.pointer.fade;
